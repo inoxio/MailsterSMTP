@@ -1,5 +1,2 @@
-# IDEA files      #
-###################
-.idea/
-bin/
-target/
+.idea
+.gradle
