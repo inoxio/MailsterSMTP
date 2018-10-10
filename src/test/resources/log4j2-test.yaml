@@ -1,0 +1,12 @@
+Configuration:
+  status: warn
+  appenders:
+    Console:
+      name: STDOUT
+      PatternLayout:
+        pattern: "%highlight{%d{HH:mm:ss.SSS} %-5level %logger{1} - %msg%n}{ERROR=Bright red, WARN=Bright yellow bold, INFO=black, DEBUG=Bright green bold}"
+  Loggers:
+    Root:
+      level: "debug"
+      AppenderRef:
+        ref: STDOUT
