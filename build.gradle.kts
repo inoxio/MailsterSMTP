@@ -13,6 +13,7 @@ java {
 
 repositories {
     mavenCentral()
+    maven("http://repo.spring.io/plugins-release")
 }
 
 dependencies {
