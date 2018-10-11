@@ -6,80 +6,74 @@ import junit.util.ServerTestCase;
  * @author Jon Stevens
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
-public class ReceiptTest extends ServerTestCase
-{
-	public ReceiptTest(String name)
-	{
-		super(name);
-	}
+public class ReceiptTest extends ServerTestCase {
 
-	public void testReceiptBeforeMail() throws Exception
-	{
-		expect("220");
+    public ReceiptTest(String name) {
+        super(name);
+    }
 
-		send("HELO foo.com");
-		expect("250");
+    public void testReceiptBeforeMail() throws Exception {
+        expect("220");
 
-		send("RCPT TO: bar@foo.com");
-		expect("503 Error: need MAIL command");
-	}
+        send("HELO foo.com");
+        expect("250");
 
-	public void testReceiptErrorInParams() throws Exception
-	{
-		expect("220");
+        send("RCPT TO: bar@foo.com");
+        expect("503 Error: need MAIL command");
+    }
 
-		send("HELO foo.com");
-		expect("250");
+    public void testReceiptErrorInParams() throws Exception {
+        expect("220");
 
-		send("MAIL FROM: success@example.org");
-		expect("250 Ok");
+        send("HELO foo.com");
+        expect("250");
 
-		send("RCPT");
-		expect("501");
-	}
+        send("MAIL FROM: success@example.org");
+        expect("250 Ok");
 
-	public void testReceiptAccept() throws Exception
-	{
-		expect("220");
+        send("RCPT");
+        expect("501");
+    }
 
-		send("HELO foo.com");
-		expect("250");
+    public void testReceiptAccept() throws Exception {
+        expect("220");
 
-		send("MAIL FROM: success@example.org");
-		expect("250 Ok");
+        send("HELO foo.com");
+        expect("250");
 
-		send("RCPT TO: failure@example.org");
-		expect("553 <failure@example.org> address unknown.");
+        send("MAIL FROM: success@example.org");
+        expect("250 Ok");
 
-		send("RCPT TO: success@example.org");
-		expect("250 Ok");
-	}
+        send("RCPT TO: failure@example.org");
+        expect("553 <failure@example.org> address unknown.");
 
-	public void testReceiptNoWhiteSpace() throws Exception
-	{
-		expect("220");
+        send("RCPT TO: success@example.org");
+        expect("250 Ok");
+    }
 
-		send("HELO foo.com");
-		expect("250");
+    public void testReceiptNoWhiteSpace() throws Exception {
+        expect("220");
 
-		send("MAIL FROM: success@example.org");
-		expect("250 Ok");
+        send("HELO foo.com");
+        expect("250");
 
-		send("RCPT TO:success@example.org");
-		expect("250 Ok");
-	}
+        send("MAIL FROM: success@example.org");
+        expect("250 Ok");
 
-	public void testReceiptEmptyAddress() throws Exception
-	{
-		expect("220");
+        send("RCPT TO:success@example.org");
+        expect("250 Ok");
+    }
 
-		send("HELO foo.com");
-		expect("250");
+    public void testReceiptEmptyAddress() throws Exception {
+        expect("220");
 
-		send("MAIL FROM: success@example.org");
-		expect("250 Ok");
+        send("HELO foo.com");
+        expect("250");
 
-		send("RCPT TO:");
-		expect("553 <> Invalid email address");
-	}
+        send("MAIL FROM: success@example.org");
+        expect("250 Ok");
+
+        send("RCPT TO:");
+        expect("553 <> Invalid email address");
+    }
 }

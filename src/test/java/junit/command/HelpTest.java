@@ -6,24 +6,22 @@ import junit.util.ServerTestCase;
  * @author Jon Stevens
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
-public class HelpTest extends ServerTestCase
-{
-	public HelpTest(String name)
-	{
-		super(name);
-	}
+public class HelpTest extends ServerTestCase {
 
-	public void testCommandHandling() throws Exception
-	{
-		expect("220");
+    public HelpTest(String name) {
+        super(name);
+    }
 
-		send("blah blah blah");
-		expect("500");
-		
-		send("HELP");
-		expect("214");
-		
-		send("HELP DATA");
-		expect("214");
-	}
+    public void testCommandHandling() throws Exception {
+        expect("220");
+
+        send("blah blah blah");
+        expect("500");
+
+        send("HELP");
+        expect("214");
+
+        send("HELP DATA");
+        expect("214");
+    }
 }

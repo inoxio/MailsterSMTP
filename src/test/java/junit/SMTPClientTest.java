@@ -2,9 +2,9 @@ package junit;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.Random;
@@ -20,12 +20,10 @@ import javax.mail.util.ByteArrayDataSource;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import junit.util.SocketUtils;
 
 import org.columba.ristretto.message.Address;
-import org.columba.ristretto.smtp.SMTPException;
 import org.columba.ristretto.smtp.SMTPProtocol;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import wiser.Wiser;
 
@@ -34,239 +32,234 @@ import wiser.Wiser;
  * internally here) as well as harder to reach code within the SMTP
  * server that tests a roundtrip message through the DATA portion
  * of the SMTP spec.
- * 
+ *
  * @author Jon Stevens
  * @author Jeff Schnitzer
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  * @author Ville Skyttä (contributed some encoding tests)
  */
-public class SMTPClientTest extends TestCase
-{
-	/** */
-	@SuppressWarnings("unused")
-	private static final Logger LOG = LoggerFactory.getLogger(SMTPClientTest.class);
-	
-	/** */
-	public static final int PORT = 2566;
+public class SMTPClientTest extends TestCase {
 
-	/** */
-	protected Wiser wiser;
-	protected Session session;
-	private Random rnd;
-	
-	/** */
-	public SMTPClientTest(String name) { super(name); }
-	
-	/** */
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		
-		Properties props = new Properties();
-		props.setProperty("mail.smtp.host", "localhost");
-		props.setProperty("mail.smtp.port", Integer.toString(PORT));
-		this.session = Session.getInstance(props);
-		
-		this.wiser = new Wiser();
-		this.wiser.setPort(PORT);
-		
-		this.wiser.start();
-		rnd = new Random();
-	}
-	
-	/** */
-	protected void tearDown() throws Exception
-	{
-		this.wiser.stop();
-		this.wiser = null;
+    private Wiser wiser;
+    private Session session;
 
-		this.session = null;
-		
-		super.tearDown();
-	}
-	
-	/** */
-	public void testMultipleRecipients() throws Exception
-	{
-		MimeMessage message = new MimeMessage(this.session);
-		message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
-		message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone2@anywhere.com"));
-		message.setFrom(new InternetAddress("someone@somewhereelse.com"));
-		message.setSubject("barf");
-		message.setText("body");
+    public SMTPClientTest(String name) {
+        super(name);
+    }
 
-		Transport.send(message);
+    public static Test suite() {
+        return new TestSuite(SMTPClientTest.class);
+    }
 
-		assertEquals(2, this.wiser.getMessages().size());
-	}
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
 
-	/** */
-	public void testLargeMessage() throws Exception
-	{
-		MimeMessage message = new MimeMessage(this.session);
-		message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
-		message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone2@anywhere.com"));
-		message.setFrom(new InternetAddress("someone@somewhereelse.com"));
-		message.setSubject("barf");
-		message.setText("bodyalksdjflkasldfkasjldfkjalskdfjlaskjdflaksdjflkjasdlfkjl");
+        wiser = new Wiser(SocketUtils.findAvailableTcpPort());
+        wiser.start();
 
-		Transport.send(message);
-		
-		assertEquals(2, this.wiser.getMessages().size());
-		
-		assertEquals("barf", this.wiser.getMessages().get(0).getMimeMessage().getSubject());
-		assertEquals("barf", this.wiser.getMessages().get(1).getMimeMessage().getSubject());
-	}
-	
+        Properties props = new Properties();
+        props.setProperty("mail.smtp.host", "localhost");
+        props.setProperty("mail.smtp.port", Integer.toString(wiser.getPort()));
+        session = Session.getInstance(props);
+    }
 
-	/** */
-	public void testUtf8EightBitMessage() throws Exception
-	{
-		// Beware editor/compiler character encoding issues; safest to put unicode escapes here
-		
-		String body = "\u00a4uro ma\u00f1ana";
-		testEightBitMessage(body, "UTF-8");
+    @Override
+    protected void tearDown() throws Exception {
+        this.wiser.stop();
+        super.tearDown();
+    }
 
-		assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
-	}
+    public void testMultipleRecipients() throws Exception {
 
-	/** */
-	public void testUtf16EightBitMessage() throws Exception
-	{
-		String body = "\u3042\u3044\u3046\u3048\u304a";
-		testEightBitMessage(body, "UTF-16");
+        // given
+        MimeMessage message = new MimeMessage(this.session);
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone2@anywhere.com"));
+        message.setFrom(new InternetAddress("someone@somewhereelse.com"));
+        message.setSubject("barf");
+        message.setText("body");
 
-		assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
-	}
-	
-	/** */
-	public void testIso88591EightBitMessage() throws Exception
-	{
-		// Beware editor/compiler character encoding issues; safest to put unicode escapes here
+        // when
+        Transport.send(message);
 
-		String body = "ma\u00f1ana";	// spanish ene (ie, n with diacritical tilde)
-		testEightBitMessage(body, "ISO-8859-1");
+        // then
+        assertEquals(2, this.wiser.getMessages().size());
+    }
 
-		assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
-	}
+    public void testLargeMessage() throws Exception {
 
-	/** */
-	public void testIso885915EightBitMessage() throws Exception
-	{
-		// Beware editor/compiler character encoding issues; safest to put unicode escapes here
+        // given
+        MimeMessage message = new MimeMessage(this.session);
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone2@anywhere.com"));
+        message.setFrom(new InternetAddress("someone@somewhereelse.com"));
+        message.setSubject("barf");
+        message.setText("bodyalksdjflkasldfkasjldfkjalskdfjlaskjdflaksdjflkjasdlfkjl");
 
-		String body = "\0xa4uro";	// should be the euro symbol
-		testEightBitMessage(body, "ISO-8859-15");
+        // when
+        Transport.send(message);
 
-		assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
-	}
+        // then
+        assertEquals(2, this.wiser.getMessages().size());
+        assertEquals("barf", this.wiser.getMessages().get(0).getMimeMessage().getSubject());
+        assertEquals("barf", this.wiser.getMessages().get(1).getMimeMessage().getSubject());
+    }
 
-	/** */
-	private void testEightBitMessage(String body, String charset) throws Exception
-	{
-		MimeMessage message = new MimeMessage(this.session);
-		message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
-		message.setFrom(new InternetAddress("someone@somewhereelse.com"));
-		message.setSubject("hello");
-		message.setText(body, charset);
-		message.setHeader("Content-Transfer-Encoding", "8bit");
+    public void testUtf8EightBitMessage() throws Exception {
 
-		Transport.send(message);
-	}
+        // given
+        String body = "\u00a4uro ma\u00f1ana";
+        MimeMessage message = new MimeMessage(this.session);
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
+        message.setFrom(new InternetAddress("someone@somewhereelse.com"));
+        message.setSubject("hello");
+        message.setText(body, "UTF-8");
+        message.setHeader("Content-Transfer-Encoding", "8bit");
 
-	/** */
-	private void testCRLFEncodingMessage(String body, String charset) throws Exception
-	{
-		Address from = new Address("someone@somewhereelse.com");
-		Address to = new Address("anyone@anywhere.com");
-        
-		//Construct the protocol that is bound to the SMTP server
-        SMTPProtocol protocol = new SMTPProtocol("localhost", PORT);
-        
-        try {
-            // Open the port
-            protocol.openPort();
-            protocol.helo(InetAddress.getLocalHost());
-                        
-            // Setup from and recipient
-            protocol.mail(from);
-            protocol.rcpt(to);
-            
-            // Finally send the data
-            protocol.data(new ByteArrayInputStream(
-            		("Subject: hello\n\n"+body).getBytes(charset)));
-            
-            // And close the session
-            protocol.quit();
-            
-        } catch (IOException e1) {
-            System.err.println(e1.getLocalizedMessage());
-        } catch (SMTPException e1) {
-            System.err.println(e1.getMessage());
+        // when
+        Transport.send(message);
+
+        // then
+        assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
+    }
+
+    public void testUtf16EightBitMessage() throws Exception {
+
+        // given
+        String body = "\u3042\u3044\u3046\u3048\u304a";
+        MimeMessage message = new MimeMessage(this.session);
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
+        message.setFrom(new InternetAddress("someone@somewhereelse.com"));
+        message.setSubject("hello");
+        message.setText(body, "UTF-16");
+        message.setHeader("Content-Transfer-Encoding", "8bit");
+
+        // when
+        Transport.send(message);
+
+        // then
+        assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
+    }
+
+    public void testIso88591EightBitMessage() throws Exception {
+
+        // given
+        String body = "ma\u00f1ana";    // spanish ene (ie, n with diacritical tilde)
+        MimeMessage message = new MimeMessage(this.session);
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
+        message.setFrom(new InternetAddress("someone@somewhereelse.com"));
+        message.setSubject("hello");
+        message.setText(body, "ISO-8859-1");
+        message.setHeader("Content-Transfer-Encoding", "8bit");
+
+        // when
+        Transport.send(message);
+
+        // then
+        assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
+    }
+
+    public void testIso885915EightBitMessage() throws Exception {
+
+        // given
+        String body = "\0xa4uro";    // should be the euro symbol
+        MimeMessage message = new MimeMessage(this.session);
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
+        message.setFrom(new InternetAddress("someone@somewhereelse.com"));
+        message.setSubject("hello");
+        message.setText(body, "ISO-8859-15");
+        message.setHeader("Content-Transfer-Encoding", "8bit");
+
+        // when
+        Transport.send(message);
+
+        // then
+        assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
+    }
+
+    public void testIso2022JPEightBitMessage() throws Exception {
+
+        // given
+        String body = "\u3042\u3044\u3046\u3048\u304a"; // some Japanese letters
+        MimeMessage message = new MimeMessage(this.session);
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
+        message.setFrom(new InternetAddress("someone@somewhereelse.com"));
+        message.setSubject("hello");
+        message.setText(body, "iso-2022-jp");
+        message.setHeader("Content-Transfer-Encoding", "8bit");
+
+        // when
+        Transport.send(message);
+
+        // then
+        assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
+    }
+
+    public void testPreservingCRLF() throws Exception {
+        String body = "\n\nKeep these pesky carriage returns\n\n";
+        testCRLFEncodingMessage(body);
+
+        Thread.sleep(500);
+        String received = this.wiser.getMessages().
+                get(0).getMimeMessage().getContent().toString();
+        assertEquals(body, received);
+    }
+
+    public void testPreservingCRLFHeavily() throws Exception {
+        String body = "\r\n\r\nKeep these\r\npesky\r\n\r\ncarriage returns\r\n";
+        testCRLFEncodingMessage(body);
+
+        Thread.sleep(500);
+        String received = this.wiser.getMessages().
+                get(0).getMimeMessage().getContent().toString();
+        assertEquals(body, received);
+    }
+
+    private void testCRLFEncodingMessage(String body) throws Exception {
+        Address from = new Address("someone@somewhereelse.com");
+        Address to = new Address("anyone@anywhere.com");
+
+        //Construct the protocol that is bound to the SMTP server
+        SMTPProtocol protocol = new SMTPProtocol("localhost", this.wiser.getServer().getPort());
+
+        // Open the port
+        protocol.openPort();
+        protocol.helo(InetAddress.getLocalHost());
+
+        // Setup from and recipient
+        protocol.mail(from);
+        protocol.rcpt(to);
+
+        // Finally send the data
+        protocol.data(new ByteArrayInputStream(("Subject: hello\n\n" + body).getBytes(StandardCharsets.ISO_8859_1)));
+
+        // And close the session
+        protocol.quit();
+    }
+
+    public void testBinaryEightBitMessage() throws Exception {
+        byte[] body = new byte[64];
+        new Random().nextBytes(body);
+
+        MimeMessage message = new MimeMessage(this.session);
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
+        message.setFrom(new InternetAddress("someone@somewhereelse.com"));
+        message.setSubject("hello");
+        message.setHeader("Content-Transfer-Encoding", "8bit");
+        message.setDataHandler(new DataHandler(new ByteArrayDataSource(body, "application/octet-stream")));
+
+        Transport.send(message);
+
+        InputStream in = this.wiser.getMessages().get(0).getMimeMessage().getInputStream();
+        ByteArrayOutputStream tmp = new ByteArrayOutputStream();
+        byte[] buf = new byte[64];
+        int n;
+        while ((n = in.read(buf)) != -1) {
+            tmp.write(buf, 0, n);
         }
-	}
-	
-	public void testIso2022JPEightBitMessage() throws Exception 
-  	{
-		String body = "\u3042\u3044\u3046\u3048\u304a"; // some Japanese letters
-		testEightBitMessage(body, "iso-2022-jp");
-		
-		assertEquals(body, this.wiser.getMessages().get(0).getMimeMessage().getContent());
-	}
+        in.close();
 
-	public void testPreservingCRLF() throws Exception 
-  	{	
-		String body = "\n\nKeep these pesky carriage returns\n\n";
-		testCRLFEncodingMessage(body, "ISO-8859-1");
-	
-		Thread.sleep(500);
-		String received = this.wiser.getMessages().
-			get(0).getMimeMessage().getContent().toString();
-		assertEquals(body, received);
-	}
-
-	public void testPreservingCRLFHeavily() throws Exception 
-  	{	
-		String body = "\r\n\r\nKeep these\r\npesky\r\n\r\ncarriage returns\r\n";
-		testCRLFEncodingMessage(body, "ISO-8859-1");
-	
-		Thread.sleep(500);
-		String received = this.wiser.getMessages().
-			get(0).getMimeMessage().getContent().toString();
-		assertEquals(body, received);
-	}
-	
-	/** */
-	public void testBinaryEightBitMessage() throws Exception
-	{
-		byte[] body = new byte[64];
-		rnd.nextBytes(body);
-		
-		MimeMessage message = new MimeMessage(this.session);
-		message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
-		message.setFrom(new InternetAddress("someone@somewhereelse.com"));
-		message.setSubject("hello");
-		message.setHeader("Content-Transfer-Encoding", "8bit");
-		message.setDataHandler(new DataHandler(new ByteArrayDataSource(body, "application/octet-stream")));
-
-		Transport.send(message);
-
-		InputStream in = this.wiser.getMessages().get(0).getMimeMessage().getInputStream();
-		ByteArrayOutputStream tmp = new ByteArrayOutputStream();
-		byte[] buf = new byte[64];
-		int n;
-		while ((n = in.read(buf)) != -1)
-		{
-			tmp.write(buf, 0, n);
-		}
-		in.close();
-		
-		assertTrue(Arrays.equals(body, tmp.toByteArray()));
-	}
-	
-	/** */
-	public static Test suite()
-	{
-		return new TestSuite(SMTPClientTest.class);
-	}
+        assertTrue(Arrays.equals(body, tmp.toByteArray()));
+    }
 }

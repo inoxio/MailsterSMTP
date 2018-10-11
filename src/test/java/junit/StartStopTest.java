@@ -1,70 +1,63 @@
 package junit;
 
 import junit.framework.TestCase;
+import junit.util.SocketUtils;
 
 import org.mailster.smtp.SMTPServer;
 
 /**
- * This class attempts to quickly start/stop the server 10 times. 
+ * This class attempts to quickly start/stop the server 10 times.
  * It makes sure that the socket bind address is correctly
  * shut down.
- * 
+ *
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
-public class StartStopTest extends TestCase 
-{
-    /** */
-    public static final int PORT = 6666;
+public class StartStopTest extends TestCase {
 
-    /** */
-    protected int counter = 0;
-
-    /** */
-    public StartStopTest(String name) 
-    {
+    public StartStopTest(String name) {
         super(name);
     }
 
-    public void testMultipleStartStop() 
-    {
-        for (int i = 0; i < 10; i++) 
-        {
-        	SMTPServer server = new SMTPServer();
-            server.setPort(PORT);
+    public void testMultipleStartStop() {
+        // given
+        var counter = 0;
+
+        // when
+        for (int i = 0; i < 10; i++) {
+            SMTPServer server = new SMTPServer();
+            server.setPort(SocketUtils.findAvailableTcpPort());
 
             server.start();
             server.stop();
 
             counter++;
         }
-        assertEquals(counter, 10);
+
+        // then
+        assertEquals(10, counter);
     }
 
-    public void testMultipleStartStopWithSameInstance() 
-    {
-    	SMTPServer server = new SMTPServer();
-        for (int i = 0; i < 10; i++) 
-        {
+    public void testMultipleStartStopWithSameInstance() {
+        SMTPServer server = new SMTPServer();
+        for (int i = 0; i < 10; i++) {
+            server.setPort(SocketUtils.findAvailableTcpPort());
             server.start();
             server.stop();
         }
     }
 
-    public void testShutdown() 
-    {
+    public void testShutdown() {
         boolean failed = false;
         SMTPServer server = new SMTPServer();
+        server.setPort(SocketUtils.findAvailableTcpPort());
         server.start();
         server.stop();
         server.shutdown();
 
-        try 
-        {
+        try {
             server.start();
-        } 
-        catch (RuntimeException ex) {
+        } catch (RuntimeException ex) {
             failed = true;
-            ex.printStackTrace();
         }
 
         assertTrue(failed);

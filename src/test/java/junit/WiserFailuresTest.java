@@ -18,11 +18,11 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import junit.framework.TestCase;
+import junit.util.SocketUtils;
 
 import org.mailster.smtp.api.MessageListener;
 import org.mailster.smtp.api.MessageListenerAdapter;
 import org.mailster.smtp.api.handler.SessionContext;
-import org.mailster.smtp.core.TooMuchDataException;
 
 import wiser.Wiser;
 import wiser.WiserMessage;
@@ -30,428 +30,329 @@ import wiser.WiserMessage;
 /**
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
-public class WiserFailuresTest extends TestCase
-{	
-	private final static String FROM_ADDRESS = "from-addr@localhost";
-	private final static String HOST_NAME = "localhost";
-	private final static String TO_ADDRESS = "to-addr@localhost";
-	private final static int SMTP_PORT = 10081;
-	private BufferedReader input;
-	private PrintWriter output;
-	private Wiser server;
-	private Socket socket;
-	
-	private int counter;
+public class WiserFailuresTest extends TestCase {
 
-	public WiserFailuresTest(String name)
-	{
-		super(name);
-	}
+    private final static String FROM_ADDRESS = "from-addr@localhost";
+    private final static String HOST_NAME = "localhost";
+    private final static String TO_ADDRESS = "to-addr@localhost";
+    private BufferedReader input;
+    private PrintWriter output;
+    private Wiser wiser;
+    private Socket socket;
 
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		server = new Wiser();
-		server.setPort(SMTP_PORT);
-		server.start();
-		socket = new Socket(HOST_NAME, SMTP_PORT);
-		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		output = new PrintWriter(socket.getOutputStream(), true);
-		
-		counter = 0;
-	}
+    private int counter;
 
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-		try { input.close(); } catch (Exception e){ e.printStackTrace(); }
-		try { output.close(); } catch (Exception e){ e.printStackTrace(); }
-		try { socket.close(); } catch (Exception e){ e.printStackTrace(); }
-		try { server.stop(); } catch (Exception e){ e.printStackTrace(); }
-	}
+    public WiserFailuresTest(String name) {
+        super(name);
+    }
 
-	/**
-	 * See http://sourceforge.net/tracker/index.php?func=detail&aid=1474700&group_id=78413&atid=553186 for discussion
-	 * about this bug
-	 */
-	public void testMailFromAfterReset() throws IOException, MessagingException
-	{
-		assertConnect();
-		sendExtendedHello(HOST_NAME);
-		sendMailFrom(FROM_ADDRESS);
-		sendReceiptTo(TO_ADDRESS);
-		sendReset();
-		sendMailFrom(FROM_ADDRESS);
-		sendReceiptTo(TO_ADDRESS);
-		sendDataStart();
-		send("");
-		send("Body");
-		sendDataEnd();
-		sendQuit();
+    @Override
+    protected void setUp() throws Exception {
 
-		assertEquals(1, server.getMessages().size());
-		Iterator<WiserMessage> emailIter = server.getMessages().iterator();
-		WiserMessage email = emailIter.next();
-		assertEquals("Body", email.getMimeMessage().getContent().toString());
-	}
+        super.setUp();
+        wiser = new Wiser(SocketUtils.findAvailableTcpPort());
+        wiser.start();
 
-	/**
-	 * See http://sourceforge.net/tracker/index.php?func=detail&aid=1474700&group_id=78413&atid=553186 for discussion
-	 * about this bug
-	 */
-	public void testMailFromWithInitialReset() throws IOException, MessagingException
-	{
-		assertConnect();
-		sendReset();
-		sendMailFrom(FROM_ADDRESS);
-		sendReceiptTo(TO_ADDRESS);
-		sendDataStart();
-		send("");
-		send("Body");
-		sendDataEnd();
-		sendQuit();
+        socket = new Socket(HOST_NAME, wiser.getPort());
+        input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        output = new PrintWriter(socket.getOutputStream(), true);
 
-		assertEquals(1, server.getMessages().size());
-		Iterator<WiserMessage> emailIter = server.getMessages().iterator();
-		WiserMessage email = emailIter.next();
-		assertEquals("Body", email.getMimeMessage().getContent().toString());
-	}
+        counter = 0;
+    }
 
-  public void testSendEncodedMessage() throws IOException, MessagingException
-  {
-		String body = "\u3042\u3044\u3046\u3048\u304a"; // some Japanese letters
-		String charset = "iso-2022-jp";
-		
-		try 
-		{
-			sendMessageWithCharset(SMTP_PORT, "sender@hereagain.com",
-					"EncodedMessage", body, "receivingagain@there.com", charset);
-		} 
-		catch (Exception e) 
-		{
-			e.printStackTrace();
-			fail("Unexpected exception: " + e);
-		}
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        try {
+            input.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            output.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            socket.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            wiser.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-		assertEquals(1, server.getMessages().size());
-		Iterator<WiserMessage> emailIter = server.getMessages().iterator();
-		WiserMessage email = emailIter.next();
-		assertEquals(body, email.getMimeMessage().getContent().toString());
-	}
-	  
-	public void testSendMessageWithCarriageReturn() throws IOException, MessagingException
-	{
-		String bodyWithCR = "\r\n\r\nKeep these\r\npesky\r\n\r\ncarriage returns\r\n";
+    /**
+     * See http://sourceforge.net/tracker/index.php?func=detail&aid=1474700&group_id=78413&atid=553186 for discussion
+     * about this bug
+     */
+    public void testMailFromAfterReset() throws IOException, MessagingException {
+        assertConnect();
+        sendExtendedHello();
+        sendMailFrom();
+        sendReceiptTo();
+        sendReset();
+        sendMailFrom();
+        sendReceiptTo();
+        sendDataStart();
+        send("");
+        send("Body");
+        sendDataEnd();
+        sendQuit();
 
-		try
-		{
-			sendMessage(SMTP_PORT, "sender@hereagain.com", 
-					"CRTest", bodyWithCR, "receivingagain@there.com");
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			fail("Unexpected exception: " + e);
-		}
+        assertEquals(1, wiser.getMessages().size());
+        Iterator<WiserMessage> emailIter = wiser.getMessages().iterator();
+        WiserMessage email = emailIter.next();
+        assertEquals("Body", email.getMimeMessage().getContent().toString());
+    }
 
-		assertEquals(1, server.getMessages().size());
-		Iterator<WiserMessage> emailIter = server.getMessages().iterator();
-		WiserMessage email = emailIter.next();
-		String received = email.getMimeMessage().getContent().toString();
-		
-		// last \r\n will be treated as part of the data termination by javamail 
-		// Transport ... so we compare the body without the last 2 chars
-		assertEquals(bodyWithCR.substring(0, bodyWithCR.length()-2), received);
-	}
+    /**
+     * See http://sourceforge.net/tracker/index.php?func=detail&aid=1474700&group_id=78413&atid=553186 for discussion
+     * about this bug
+     */
+    public void testMailFromWithInitialReset() throws IOException, MessagingException {
+        assertConnect();
+        sendReset();
+        sendMailFrom();
+        sendReceiptTo();
+        sendDataStart();
+        send("");
+        send("Body");
+        sendDataEnd();
+        sendQuit();
 
-	public void testListenersAndContextAttributes()
-		throws IOException
-	{
-		try
-		{
-			MimeMessage[] mimeMessages = new MimeMessage[2];
-			Properties mailProps = getMailProperties(SMTP_PORT);
-			Session session = Session.getInstance(mailProps, null);
-			session.setDebug(true);
-	
-			mimeMessages[0] = createMessage(session, "sender@whatever.com", "receiver@home.com", "Doodle1", "Bug1");
-			mimeMessages[1] = createMessage(session, "sender@whatever.com", "receiver@home.com", "Doodle2", "Bug2");
-	
-			server.getServer().getDeliveryHandlerFactory().addListener(new MessageListenerAdapter() {
-				public boolean accept(SessionContext ctx, 
-										String from, String recipient) 
-				{
-					ctx.addAttribute("prop2", "prop2_value");
-					return true;
-				}
-			});
-			
-			Transport transport = session.getTransport("smtp");
-			transport.connect("localhost", SMTP_PORT, null, null);	
-			transport.sendMessage(mimeMessages[0], mimeMessages[0].getAllRecipients());
-			transport.close();
-			
-			server.getServer().getDeliveryHandlerFactory().addListener(new MessageListener() {
-				public void deliver(SessionContext ctx, String from, 
-									String recipient, InputStream data)
-					throws TooMuchDataException, IOException 
-				{
-					counter++;
-					assertEquals("prop1_value", (String) ctx.getAttribute("prop1"));
-					assertEquals("prop2_value", (String) ctx.getAttribute("prop2"));
-				}
-			
-				public boolean accept(SessionContext ctx, 
-										String from, String recipient) 
-				{
-					ctx.addAttribute("prop1", "prop1_value");
-					return true;
-				}
-			});	
-			
-			transport.connect("localhost", SMTP_PORT, null, null);	
-			transport.sendMessage(mimeMessages[1], mimeMessages[1].getAllRecipients());
-			transport.close();
-		}
-		catch (MessagingException e)
-		{
-			e.printStackTrace();
-			fail("Unexpected exception: " + e);
-		}
-	
-		assertEquals(1, counter);
-		assertEquals(2, server.getMessages().size());
-	}
-	
-	public void testSendTwoMessagesSameConnection()
-		throws IOException
-	{
-		try
-		{
-			MimeMessage[] mimeMessages = new MimeMessage[2];
-			Properties mailProps = getMailProperties(SMTP_PORT);
-			Session session = Session.getInstance(mailProps, null);
-			session.setDebug(true);
+        assertEquals(1, wiser.getMessages().size());
+        Iterator<WiserMessage> emailIter = wiser.getMessages().iterator();
+        WiserMessage email = emailIter.next();
+        assertEquals("Body", email.getMimeMessage().getContent().toString());
+    }
 
-			mimeMessages[0] = createMessage(session, "sender@whatever.com", "receiver@home.com", "Doodle1", "Bug1");
-			mimeMessages[1] = createMessage(session, "sender@whatever.com", "receiver@home.com", "Doodle2", "Bug2");
+    public void testSendEncodedMessage() throws IOException, MessagingException {
+        String body = "\u3042\u3044\u3046\u3048\u304a"; // some Japanese letters
+        String charset = "iso-2022-jp";
 
-			Transport transport = session.getTransport("smtp");
-			transport.connect("localhost", SMTP_PORT, null, null);
+        // when
+        sendMessage("EncodedMessage", body, charset);
+
+        // then
+        assertEquals(1, wiser.getMessages().size());
+        Iterator<WiserMessage> emailIter = wiser.getMessages().iterator();
+        WiserMessage email = emailIter.next();
+        assertEquals(body, email.getMimeMessage().getContent().toString());
+    }
+
+    public void testSendMessageWithCarriageReturn() throws IOException, MessagingException {
+        String bodyWithCR = "\r\n\r\nKeep these\r\npesky\r\n\r\ncarriage returns\r\n";
+
+        // when
+        sendMessage("CRTest", bodyWithCR, null);
+
+        // then
+        assertEquals(1, wiser.getMessages().size());
+        Iterator<WiserMessage> emailIter = wiser.getMessages().iterator();
+        WiserMessage email = emailIter.next();
+        String received = email.getMimeMessage().getContent().toString();
+
+        // last \r\n will be treated as part of the data termination by javamail
+        // Transport ... so we compare the body without the last 2 chars
+        assertEquals(bodyWithCR.substring(0, bodyWithCR.length() - 2), received);
+    }
+
+    public void testListenersAndContextAttributes() throws MessagingException {
+
+        MimeMessage[] mimeMessages = new MimeMessage[2];
+        Properties mailProps = getMailProperties(wiser.getPort());
+        Session session = Session.getInstance(mailProps, null);
+        session.setDebug(true);
+
+        mimeMessages[0] = createMessage(session, "Doodle1", "Bug1", null);
+        mimeMessages[1] = createMessage(session, "Doodle2", "Bug2", null);
+
+        wiser.getServer().getDeliveryHandlerFactory().addListener(new MessageListenerAdapter() {
+            @Override
+            public boolean accept(SessionContext ctx, String from, String recipient) {
+                ctx.addAttribute("prop2", "prop2_value");
+                return true;
+            }
+        });
+
+        Transport transport = session.getTransport("smtp");
+        transport.connect("localhost", wiser.getPort(), null, null);
+        transport.sendMessage(mimeMessages[0], mimeMessages[0].getAllRecipients());
+        transport.close();
+
+        wiser.getServer().getDeliveryHandlerFactory().addListener(new MessageListener() {
+            @Override
+            public void deliver(SessionContext ctx, String from, String recipient, InputStream data) {
+                counter++;
+                assertEquals("prop1_value", (String) ctx.getAttribute("prop1"));
+                assertEquals("prop2_value", (String) ctx.getAttribute("prop2"));
+            }
+
+            @Override
+            public boolean accept(SessionContext ctx, String from, String recipient) {
+                ctx.addAttribute("prop1", "prop1_value");
+                return true;
+            }
+        });
+
+        transport.connect("localhost", wiser.getPort(), null, null);
+        transport.sendMessage(mimeMessages[1], mimeMessages[1].getAllRecipients());
+        transport.close();
+
+        assertEquals(1, counter);
+        assertEquals(2, wiser.getMessages().size());
+    }
+
+    public void testSendTwoMessagesSameConnection() throws MessagingException {
+
+        MimeMessage[] mimeMessages = new MimeMessage[2];
+        Properties mailProps = getMailProperties(wiser.getPort());
+        Session session = Session.getInstance(mailProps, null);
+        session.setDebug(true);
+
+        mimeMessages[0] = createMessage(session, "Doodle1", "Bug1", null);
+        mimeMessages[1] = createMessage(session, "Doodle2", "Bug2", null);
+
+        try (Transport transport = session.getTransport("smtp")) {
+            transport.connect("localhost", wiser.getPort(), null, null);
 
             for (MimeMessage mimeMessage : mimeMessages) {
                 transport.sendMessage(mimeMessage, mimeMessage.getAllRecipients());
             }
+        }
+        assertEquals(2, wiser.getMessages().size());
+    }
 
-			transport.close();
-		}
-		catch (MessagingException e)
-		{
-			e.printStackTrace();
-			fail("Unexpected exception: " + e);
-		}
+    public void testSendTwoMsgsWithLogin() throws MessagingException, IOException {
 
-		assertEquals(2, server.getMessages().size());
-	}
+        String From = "sender@here.com";
+        String To = "receiver@there.com";
+        String Subject = "Test";
+        String body = "Test Body";
 
-	public void testSendTwoMsgsWithLogin() throws MessagingException, IOException
-	{
-		try
-		{
-			String From = "sender@here.com";
-			String To = "receiver@there.com";
-			String Subject = "Test";
-			String body = "Test Body";
+        Session session = Session.getInstance(getMailProperties(wiser.getPort()), null);
+        Message msg = new MimeMessage(session);
+        msg.setFrom(new InternetAddress(From));
+        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(To, false));
+        msg.setSubject(Subject);
 
-			Session session = Session.getInstance(getMailProperties(SMTP_PORT), null);
-			Message msg = new MimeMessage(session);
-			msg.setFrom(new InternetAddress(From));
-			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(To, false));
-			msg.setSubject(Subject);
+        msg.setText(body);
+        msg.setHeader("X-Mailer", "here");
+        msg.setSentDate(new Date());
 
-			msg.setText(body);
-			msg.setHeader("X-Mailer", "here");
-			msg.setSentDate(new Date());
+        try (Transport transport = session.getTransport("smtp")) {
+            transport.connect(HOST_NAME, wiser.getPort(), "ddd", "ddd");
+            assertEquals(0, wiser.getMessages().size());
+            transport.sendMessage(msg, InternetAddress.parse(To, false));
+            assertEquals(1, wiser.getMessages().size());
+            transport.sendMessage(msg, InternetAddress.parse("receivingagain@there.com", false));
+            assertEquals(2, wiser.getMessages().size());
+        }
 
-			Transport transport = null;
+        Iterator<WiserMessage> emailIter = wiser.getMessages().iterator();
+        WiserMessage email = emailIter.next();
+        MimeMessage mime = email.getMimeMessage();
+        assertEquals("Test", mime.getHeader("Subject")[0]);
+        assertEquals("Test Body", mime.getContent().toString());
+    }
 
-			try
-			{
-				transport = session.getTransport("smtp");
-				transport.connect(HOST_NAME, SMTP_PORT, "ddd", "ddd");
-				assertEquals(0, server.getMessages().size());
-				transport.sendMessage(msg, InternetAddress.parse(To, false));
-				assertEquals(1, server.getMessages().size());
-				transport.sendMessage(msg, InternetAddress.parse("receivingagain@there.com", false));
-				assertEquals(2, server.getMessages().size());
-			}
-			catch (javax.mail.MessagingException me)
-			{
-				me.printStackTrace();
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-			finally
-			{
-				if (transport != null)
-					transport.close();
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+    private Properties getMailProperties(int port) {
+        Properties mailProps = new Properties();
+        mailProps.setProperty("mail.smtp.host", "localhost");
+        mailProps.setProperty("mail.smtp.port", "" + port);
+        mailProps.setProperty("mail.smtp.sendpartial", "true");
+        return mailProps;
+    }
 
-		Iterator<WiserMessage> emailIter = server.getMessages().iterator();
-		WiserMessage email = emailIter.next();
-		MimeMessage mime = email.getMimeMessage();
-		assertEquals("Test", mime.getHeader("Subject")[0]);
-		assertEquals("Test Body", mime.getContent().toString());
-	}
+    private void sendMessage(String subject, String body, String charset) throws MessagingException {
 
-	private Properties getMailProperties(int port)
-	{
-		Properties mailProps = new Properties();
-		mailProps.setProperty("mail.smtp.host", "localhost");
-		mailProps.setProperty("mail.smtp.port", "" + port);
-		mailProps.setProperty("mail.smtp.sendpartial", "true");
-		return mailProps;
-	}
+        Properties mailProps = getMailProperties(wiser.getPort());
+        Session session = Session.getInstance(mailProps, null);
 
-	private void sendMessage(int port, String from, String subject, String body, String to) throws MessagingException, IOException
-	{
-		Properties mailProps = getMailProperties(SMTP_PORT);
-		Session session = Session.getInstance(mailProps, null);
-		//session.setDebug(true);
+        MimeMessage msg = createMessage(session, subject, body, charset);
+        Transport.send(msg);
+    }
 
-		MimeMessage msg = createMessage(session, from, to, subject, body);
-		Transport.send(msg);
-	}
+    private MimeMessage createMessage(Session session, String subject, String body, String charset) throws MessagingException {
 
-	private MimeMessage createMessage(Session session, String from, String to, String subject, String body)
-		throws MessagingException, IOException
-	{
-		MimeMessage msg = new MimeMessage(session);
-		msg.setFrom(new InternetAddress(from));
-		msg.setSubject(subject);
-		msg.setSentDate(new Date());
-		msg.setText(body);		
-		msg.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
-		return msg;
-	}
+        MimeMessage msg = new MimeMessage(session);
+        msg.setFrom(new InternetAddress("sender@whatever.com"));
+        msg.setSubject(subject);
+        msg.setSentDate(new Date());
+        if (charset != null) {
+            msg.setText(body, charset);
+            msg.setHeader("Content-Transfer-Encoding", "7bit");
+        } else {
+            msg.setText(body);
+        }
 
-    private void sendMessageWithCharset(int port, String from, String subject, String body, String to, String charset) 
-		throws MessagingException 
-	{
-	   Properties mailProps = getMailProperties(port);
-	   Session session = Session.getInstance(mailProps, null);
-	   //session.setDebug(true);
-	
-	   MimeMessage msg = createMessageWithCharset(session, from, to, subject, body, charset);
-	   Transport.send(msg);
-	 }
-	
-	private MimeMessage createMessageWithCharset(
-	  Session session, String from, String to, String subject, String body, String charset) 
-		throws MessagingException 
-	{
-	   MimeMessage msg = new MimeMessage(session);
-	   msg.setFrom(new InternetAddress(from));
-	   msg.setSubject(subject);
-	   msg.setSentDate(new Date());
-	   if (charset != null) 
-	   {
-		   msg.setText(body, charset);
-		   msg.setHeader("Content-Transfer-Encoding", "7bit");
-	   } 
-	   else
-		   msg.setText(body);
-	
-	   msg.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
-	   return msg;
-	 }
-	
-	private void assertConnect() throws IOException
-	{
-		String response = readInput();
-		assertTrue(response, response.startsWith("220"));
-	}
+        msg.setRecipient(Message.RecipientType.TO, new InternetAddress("receiver@home.com"));
+        return msg;
+    }
 
-	private void sendDataEnd() throws IOException
-	{
-		send(".");
-		String response = readInput();
-		assertTrue(response, response.startsWith("250"));
-	}
+    private void assertConnect() throws IOException {
+        String response = readInput();
+        assertTrue(response, response.startsWith("220"));
+    }
 
-	private void sendDataStart() throws IOException
-	{
-		send("DATA");
-		String response = readInput();
-		assertTrue(response, response.startsWith("354"));
-	}
+    private void sendDataEnd() throws IOException {
+        send(".");
+        String response = readInput();
+        assertTrue(response, response.startsWith("250"));
+    }
 
-	private void sendExtendedHello(String hostName) throws IOException
-	{
-		send("EHLO " + hostName);
-		String response = readInput();
-		assertTrue(response, response.startsWith("250"));
-	}
+    private void sendDataStart() throws IOException {
+        send("DATA");
+        String response = readInput();
+        assertTrue(response, response.startsWith("354"));
+    }
 
-	private void sendMailFrom(String fromAddress) throws IOException
-	{
-		send("MAIL FROM:<" + fromAddress + ">");
-		String response = readInput();
-		assertTrue(response, response.startsWith("250"));
-	}
+    private void sendExtendedHello() throws IOException {
+        send("EHLO " + WiserFailuresTest.HOST_NAME);
+        String response = readInput();
+        assertTrue(response, response.startsWith("250"));
+    }
 
-	private void sendQuit() throws IOException
-	{
-		send("QUIT");
-		String response = readInput();
-		assertTrue(response, response.startsWith("221"));
-	}
+    private void sendMailFrom() throws IOException {
+        send("MAIL FROM:<" + WiserFailuresTest.FROM_ADDRESS + ">");
+        String response = readInput();
+        assertTrue(response, response.startsWith("250"));
+    }
 
-	private void sendReceiptTo(String toAddress) throws IOException
-	{
-		send("RCPT TO:<" + toAddress + ">");
-		String response = readInput();
-		assertTrue(response, response.startsWith("250"));
-	}
+    private void sendQuit() throws IOException {
+        send("QUIT");
+        String response = readInput();
+        assertTrue(response, response.startsWith("221"));
+    }
 
-	private void sendReset() throws IOException
-	{
-		send("RSET");
-		String response = readInput();
-		assertTrue(response, response.startsWith("250"));
-	}
+    private void sendReceiptTo() throws IOException {
+        send("RCPT TO:<" + WiserFailuresTest.TO_ADDRESS + ">");
+        String response = readInput();
+        assertTrue(response, response.startsWith("250"));
+    }
 
-	private void send(String msg) throws IOException
-	{
-		// Force \r\n since println() behaves differently on different platforms
-		output.print(msg + "\r\n");
-		output.flush();
-	}
+    private void sendReset() throws IOException {
+        send("RSET");
+        String response = readInput();
+        assertTrue(response, response.startsWith("250"));
+    }
 
-	private String readInput()
-	{
-		StringBuilder sb = new StringBuilder();
-		try
-		{
-			do
-			{
-				sb.append(input.readLine()).append("\n");
-			}
-			while (input.ready());
+    private void send(String msg) {
+        // Force \r\n since println() behaves differently on different platforms
+        output.print(msg + "\r\n");
+        output.flush();
+    }
 
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+    private String readInput() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        do {
+            sb.append(input.readLine()).append("\n");
+        } while (input.ready());
 
-		return sb.toString();
-	}
+        return sb.toString();
+    }
 }
