@@ -24,13 +24,10 @@ dependencies {
     compile("com.sun.mail:javax.mail:1.6.2")
     compile("commons-validator:commons-validator:1.6")
     // test
-    testCompile("javax.activation:activation:1.1.1")
     testCompile("junit:junit:4.12")
     testCompile("org.columba:ristretto:1.0-all")
     // logging
     testRuntime("org.apache.logging.log4j:log4j-slf4j-impl:2.11.1")
-    testRuntime("com.fasterxml.jackson.core:jackson-databind:2.9.7")
-    testRuntime("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.7")
 }
 
 tasks {
