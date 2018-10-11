@@ -3,10 +3,11 @@ package junit.util;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 
 /**
@@ -19,16 +20,18 @@ import java.net.UnknownHostException;
  */
 public class Client implements Closeable {
 
+    private static final byte[] STOPWORD = new byte[]{13, 10, 46, 13, 10};
+
     private Socket socket;
     private BufferedReader reader;
-    private PrintWriter writer;
+    private OutputStream out;
 
     /**
      * Establishes a connection to host and port.
      */
     public Client(String host, int port) throws IOException {
         socket = new Socket(host, port);
-        writer = new PrintWriter(socket.getOutputStream(), true);
+        out = socket.getOutputStream();
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
@@ -36,10 +39,20 @@ public class Client implements Closeable {
      * Sends a message to the server, ie "HELO foo.example.com". A newline will
      * be appended to the message.
      */
-    public void send(String msg) {
-        // Force \r\n since println() behaves differently on different platforms
-        writer.print(msg + "\r\n");
-        writer.flush();
+    public void send(String msg) throws IOException {
+        out.write(msg.getBytes());
+        out.write(13);
+        out.write(10);
+        out.flush();
+    }
+
+    public void send(InputStream inputStream) throws IOException {
+        var data = new StopWordSafeInputStream(inputStream);
+        int b;
+        while((b = data.read()) != -1) {
+            out.write(b);
+        }
+        out.write(STOPWORD);
     }
 
     /**
@@ -82,5 +95,4 @@ public class Client implements Closeable {
     public void close() throws IOException {
         socket.close();
     }
-
 }

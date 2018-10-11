@@ -1,5 +1,7 @@
 package junit.util;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
 
 import org.mailster.smtp.api.handler.SessionContext;
@@ -47,7 +49,7 @@ public abstract class ServerTestCase extends TestCase {
         super.tearDown();
     }
 
-    public void send(String msg) {
+    public void send(String msg) throws IOException {
         this.client.send(msg);
     }
 

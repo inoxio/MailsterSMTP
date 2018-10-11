@@ -3,7 +3,6 @@ package junit;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Properties;
@@ -20,10 +19,8 @@ import javax.mail.util.ByteArrayDataSource;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import junit.util.Client;
 import junit.util.SocketUtils;
-
-import org.columba.ristretto.message.Address;
-import org.columba.ristretto.smtp.SMTPProtocol;
 
 import wiser.Wiser;
 
@@ -197,45 +194,56 @@ public class SMTPClientTest extends TestCase {
     }
 
     public void testPreservingCRLF() throws Exception {
+
+        // given
         String body = "\n\nKeep these pesky carriage returns\n\n";
+
+        // when
         testCRLFEncodingMessage(body);
 
+        // then
         Thread.sleep(500);
-        String received = this.wiser.getMessages().
-                get(0).getMimeMessage().getContent().toString();
+        String received = this.wiser.getMessages().get(0).getMimeMessage().getContent().toString();
         assertEquals(body, received);
     }
 
     public void testPreservingCRLFHeavily() throws Exception {
+
+        // given
         String body = "\r\n\r\nKeep these\r\npesky\r\n\r\ncarriage returns\r\n";
+
+        // when
         testCRLFEncodingMessage(body);
 
+        // then
         Thread.sleep(500);
-        String received = this.wiser.getMessages().
-                get(0).getMimeMessage().getContent().toString();
+        String received = this.wiser.getMessages().get(0).getMimeMessage().getContent().toString();
         assertEquals(body, received);
     }
 
     private void testCRLFEncodingMessage(String body) throws Exception {
-        Address from = new Address("someone@somewhereelse.com");
-        Address to = new Address("anyone@anywhere.com");
+        try (var client = new Client("localhost", wiser.getPort())) {
 
-        //Construct the protocol that is bound to the SMTP server
-        SMTPProtocol protocol = new SMTPProtocol("localhost", this.wiser.getServer().getPort());
+            client.expect("220");
 
-        // Open the port
-        protocol.openPort();
-        protocol.helo(InetAddress.getLocalHost());
+            client.send("HELO foo.com");
+            client.expect("250");
 
-        // Setup from and recipient
-        protocol.mail(from);
-        protocol.rcpt(to);
+            client.send("MAIL FROM: someone@somewhereelse.com");
+            client.expect("250");
 
-        // Finally send the data
-        protocol.data(new ByteArrayInputStream(("Subject: hello\n\n" + body).getBytes(StandardCharsets.ISO_8859_1)));
+            client.send("RCPT TO: anyone@anywhere.com");
+            client.expect("250");
 
-        // And close the session
-        protocol.quit();
+            client.send("DATA");
+            client.expect("354 End data with <CR><LF>.<CR><LF>");
+
+            client.send(new ByteArrayInputStream(("Subject: hello\n\n" + body).getBytes(StandardCharsets.ISO_8859_1)));
+            client.expect("250");
+
+            client.send("QUIT");
+            client.expect("221 Bye");
+        }
     }
 
     public void testBinaryEightBitMessage() throws Exception {

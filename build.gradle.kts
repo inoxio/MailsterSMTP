@@ -13,7 +13,6 @@ java {
 
 repositories {
     mavenCentral()
-    maven("http://repo.spring.io/plugins-release")
 }
 
 dependencies {
@@ -25,7 +24,6 @@ dependencies {
     compile("commons-validator:commons-validator:1.6")
     // test
     testCompile("junit:junit:4.12")
-    testCompile("org.columba:ristretto:1.0-all")
     // logging
     testRuntime("org.apache.logging.log4j:log4j-slf4j-impl:2.11.1")
 }

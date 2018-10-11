@@ -21,7 +21,6 @@ public class WiserMessage implements Closeable {
     private String envelopeSender;
     private String envelopeReceiver;
     private InputStream stream;
-    private byte[] array;
     private MimeMessage message = null;
 
     public WiserMessage(String envelopeSender, String envelopeReceiver, InputStream stream) {
