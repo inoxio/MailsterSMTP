@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Properties;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -28,7 +27,6 @@ import junit.util.SocketUtils;
 import com.sun.mail.smtp.SMTPTransport;
 
 import wiser.Wiser;
-import wiser.WiserMessage;
 
 /**
  * This class tests the transfer speed of emails that carry

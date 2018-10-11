@@ -1,6 +1,5 @@
 package org.mailster.smtp.api;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import org.mailster.smtp.api.handler.SessionContext;

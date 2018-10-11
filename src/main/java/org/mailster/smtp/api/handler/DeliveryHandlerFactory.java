@@ -1,6 +1,5 @@
 package org.mailster.smtp.api.handler;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 

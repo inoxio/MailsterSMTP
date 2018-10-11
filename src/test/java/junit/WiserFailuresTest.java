@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -25,7 +24,6 @@ import org.mailster.smtp.api.MessageListenerAdapter;
 import org.mailster.smtp.api.handler.SessionContext;
 
 import wiser.Wiser;
-import wiser.WiserMessage;
 
 /**
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;

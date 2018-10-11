@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.mailster.smtp.core.SMTPContext;
 import org.mailster.smtp.core.auth.AuthenticationHandler;
-import org.mailster.smtp.core.auth.LoginFailedException;
 
 /**
  * Implements a dummy AUTH mechanism.<br />

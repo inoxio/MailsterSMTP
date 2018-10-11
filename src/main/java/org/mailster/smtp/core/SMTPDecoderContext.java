@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 
 import javax.mail.util.SharedByteArrayInputStream;

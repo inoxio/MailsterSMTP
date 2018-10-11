@@ -3,12 +3,9 @@ package org.mailster.smtp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mailster.smtp.api.MessageListener;
 import org.mailster.smtp.api.handler.AbstractDeliveryHandler;
 import org.mailster.smtp.api.handler.Delivery;
 import org.mailster.smtp.api.handler.DeliveryContext;

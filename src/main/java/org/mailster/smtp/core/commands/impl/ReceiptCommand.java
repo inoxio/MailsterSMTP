@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.apache.mina.core.session.IoSession;
 import org.mailster.smtp.api.handler.RejectException;
 import org.mailster.smtp.core.SMTPContext;
-import org.mailster.smtp.core.SMTPState;
 import org.mailster.smtp.core.commands.AbstractCommand;
 
 /**

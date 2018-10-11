@@ -12,7 +12,6 @@ import org.apache.mina.filter.ssl.SslFilter.SslFilterMessage;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.mailster.smtp.SMTPServerConfig;
 import org.mailster.smtp.api.handler.DeliveryHandlerFactory;
-import org.mailster.smtp.core.commands.Command;
 import org.mailster.smtp.core.commands.CommandException;
 import org.mailster.smtp.core.commands.CommandHandler;
 import org.slf4j.Logger;
