@@ -8,26 +8,23 @@ import org.mailster.smtp.core.commands.AbstractCommand;
 
 /**
  * The NOOP command implementation.
- * 
+ *
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
-public class NoopCommand extends AbstractCommand
-{
-	public NoopCommand()
-	{
-		super("NOOP", "The NOOP command does nothing. It can be used to keep the\n"+
-				"current session alive pinging it to prevent a timeout");
-	}
+public class NoopCommand extends AbstractCommand {
 
-	@Override
-	public boolean isAuthRequired()
-	{
-		return false;
-	}
+    public NoopCommand() {
+        super("NOOP",
+              "The NOOP command does nothing. It can be used to keep the\ncurrent session alive pinging it to prevent a timeout");
+    }
 
-	public void execute(String commandString, IoSession ioSession, SMTPContext ctx) 
-		throws IOException
-	{
-		sendResponse(ioSession, "250 Ok");
-	}
+    @Override
+    public boolean isAuthRequired() {
+        return false;
+    }
+
+    @Override
+    public void execute(String commandString, IoSession ioSession, SMTPContext ctx) throws IOException {
+        sendResponse(ioSession, "250 Ok");
+    }
 }

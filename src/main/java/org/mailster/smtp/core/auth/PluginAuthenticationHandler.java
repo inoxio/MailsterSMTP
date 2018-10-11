@@ -14,84 +14,69 @@ import org.mailster.smtp.core.SMTPContext;
  * @author Marco Trevisan <mrctrevisan@yahoo.it>
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
-public class PluginAuthenticationHandler implements AuthenticationHandler
-{
-	private List<AuthenticationHandler> plugins;
+public class PluginAuthenticationHandler implements AuthenticationHandler {
 
-	private AuthenticationHandler activeHandler;
+    private List<AuthenticationHandler> plugins;
 
-	/** Creates a new instance of PluginAuthenticationHandler */
-	public PluginAuthenticationHandler()
-	{
-		this.plugins = new ArrayList<>();
-	}
+    private AuthenticationHandler activeHandler;
 
-	public List<String> getAuthenticationMechanisms()
-	{
-		List<String> ret = new ArrayList<>();
-		for (AuthenticationHandler plugin : plugins)
-		{
-			ret.addAll(plugin.getAuthenticationMechanisms());
-		}
-		return ret;
-	}
+    public PluginAuthenticationHandler() {
+        this.plugins = new ArrayList<>();
+    }
 
-	public boolean auth(String clientInput, StringBuilder response, SMTPContext ctx)
-			throws LoginFailedException
-	{
-		StringTokenizer stk = new StringTokenizer(clientInput);
-		if (stk.nextToken().equalsIgnoreCase("AUTH"))
-		{
-			resetState();
-			activateHandler(stk.nextToken().toUpperCase());
-		}
-		return getActiveHandler().auth(clientInput, response, ctx);
-	}
+    @Override
+    public List<String> getAuthenticationMechanisms() {
+        List<String> ret = new ArrayList<>();
+        for (AuthenticationHandler plugin : plugins) {
+            ret.addAll(plugin.getAuthenticationMechanisms());
+        }
+        return ret;
+    }
 
-	public void resetState()
-	{
-		if (getActiveHandler() != null)
-		{
-			getActiveHandler().resetState();
-		}
-		setActiveHandler(null);
-	}
+    @Override
+    public boolean auth(String clientInput, StringBuilder response, SMTPContext ctx) throws LoginFailedException {
+        StringTokenizer stk = new StringTokenizer(clientInput);
+        if (stk.nextToken().equalsIgnoreCase("AUTH")) {
+            resetState();
+            activateHandler(stk.nextToken().toUpperCase());
+        }
+        return getActiveHandler().auth(clientInput, response, ctx);
+    }
 
-	private void activateHandler(final String mechanism)
-	{
-		for (AuthenticationHandler plugin : plugins)
-		{
-			if (plugin.getAuthenticationMechanisms().contains(
-					mechanism))
-			{
-				setActiveHandler(plugin);
-				return;
-			}
-		}
-	}
+    @Override
+    public void resetState() {
+        if (getActiveHandler() != null) {
+            getActiveHandler().resetState();
+        }
+        setActiveHandler(null);
+    }
 
-	public List<AuthenticationHandler> getPlugins()
-	{
-		return plugins;
-	}
+    private void activateHandler(final String mechanism) {
+        for (AuthenticationHandler plugin : plugins) {
+            if (plugin.getAuthenticationMechanisms().contains(mechanism)) {
+                setActiveHandler(plugin);
+                return;
+            }
+        }
+    }
 
-	public void addPlugin(AuthenticationHandler plugin)
-	{
-		plugins.add(plugin);
-	}
+    public List<AuthenticationHandler> getPlugins() {
+        return plugins;
+    }
 
-	public void setPlugins(List<AuthenticationHandler> plugins)
-	{
-		this.plugins = plugins;
-	}
+    public void setPlugins(List<AuthenticationHandler> plugins) {
+        this.plugins = plugins;
+    }
 
-	private AuthenticationHandler getActiveHandler()
-	{
-		return activeHandler;
-	}
+    public void addPlugin(AuthenticationHandler plugin) {
+        plugins.add(plugin);
+    }
 
-	private void setActiveHandler(AuthenticationHandler activeHandler)
-	{
-		this.activeHandler = activeHandler;
-	}
+    private AuthenticationHandler getActiveHandler() {
+        return activeHandler;
+    }
+
+    private void setActiveHandler(AuthenticationHandler activeHandler) {
+        this.activeHandler = activeHandler;
+    }
 }

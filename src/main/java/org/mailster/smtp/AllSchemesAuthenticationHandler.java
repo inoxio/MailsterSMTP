@@ -10,28 +10,25 @@ import org.mailster.smtp.core.auth.impl.PlainAuthenticationHandler;
 
 /**
  * Implements a {@link PluginAuthenticationHandler} handler which
- * loads all implementations available except 
- * {@link DummyAuthenticationHandler}. 
- * 
- * @see DummyAuthenticationHandler for exclusion reasons.
- * 
+ * loads all implementations available except
+ * {@link DummyAuthenticationHandler}.
+ *
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
+ * @see DummyAuthenticationHandler for exclusion reasons.
  */
-public class AllSchemesAuthenticationHandler implements
-		AuthenticationHandlerFactory 
-{
-	private LoginValidator validator;
-	
-	public AllSchemesAuthenticationHandler(LoginValidator validator)
-	{
-		this.validator = validator;
-	}
-	
-	public AuthenticationHandler create() 
-	{
-		PluginAuthenticationHandler ret = new PluginAuthenticationHandler();
-		ret.addPlugin(new PlainAuthenticationHandler(validator));
-		ret.addPlugin(new LoginAuthenticationHandler(validator));
-		return ret;
-	}
+public class AllSchemesAuthenticationHandler implements AuthenticationHandlerFactory {
+
+    private LoginValidator validator;
+
+    public AllSchemesAuthenticationHandler(LoginValidator validator) {
+        this.validator = validator;
+    }
+
+    @Override
+    public AuthenticationHandler create() {
+        PluginAuthenticationHandler ret = new PluginAuthenticationHandler();
+        ret.addPlugin(new PlainAuthenticationHandler(validator));
+        ret.addPlugin(new LoginAuthenticationHandler(validator));
+        return ret;
+    }
 }

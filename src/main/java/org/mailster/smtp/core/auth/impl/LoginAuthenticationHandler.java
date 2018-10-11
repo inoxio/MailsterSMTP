@@ -16,108 +16,96 @@ import org.mailster.smtp.util.Base64;
  * Implements the SMTP AUTH LOGIN mechanism.<br />
  * You are only required to plug your LoginValidator implementation
  * for username and password validation to take effect.
- * 
+ *
  * @author Marco Trevisan <mrctrevisan@yahoo.it>
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
-public class LoginAuthenticationHandler implements AuthenticationHandler
-{
-	private String username;
+public class LoginAuthenticationHandler implements AuthenticationHandler {
 
-	private String password;
+    private String username;
 
-	private LoginValidator helper;
+    private String password;
 
-	private List<String> authentificationMechanisms;
-	
-	/** Creates a new instance of LoginAuthenticationHandler */
-	public LoginAuthenticationHandler(LoginValidator helper)
-	{
-		this.helper = helper;
+    private LoginValidator helper;
 
-		authentificationMechanisms = new ArrayList<>(1);
-		authentificationMechanisms.add("LOGIN");
-	}
+    private List<String> authentificationMechanisms;
 
-	/**
-	 * 
-	 */
-	public List<String> getAuthenticationMechanisms()
-	{
-		return Collections.unmodifiableList(authentificationMechanisms);
-	}
+    public LoginAuthenticationHandler(LoginValidator helper) {
+        this.helper = helper;
 
-	/**
-	 * 
-	 */
-	public boolean auth(String clientInput, StringBuilder response, SMTPContext ctx) 
-		throws LoginFailedException
-	{
-		StringTokenizer stk = new StringTokenizer(clientInput);
-		String token = stk.nextToken();
-		if (token.trim().equalsIgnoreCase("AUTH"))
-		{
-			// The RFC2554 "initial-response" parameter must not be present
-			// The line must be in the form of "AUTH LOGIN"
-			if (!stk.nextToken().trim().equalsIgnoreCase("LOGIN"))
-			{
-				// Mechanism mismatch
-				response.append("504 AUTH mechanism mismatch");
-				return true;
-			}
+        authentificationMechanisms = new ArrayList<>(1);
+        authentificationMechanisms.add("LOGIN");
+    }
 
-			if (stk.hasMoreTokens())
-			{
-				// the client submitted an initial response
-				response.append("535 Initial response not allowed in AUTH LOGIN");
-				return true;
-			}
+    /**
+     *
+     */
+    @Override
+    public List<String> getAuthenticationMechanisms() {
+        return Collections.unmodifiableList(authentificationMechanisms);
+    }
 
-			response.append("334 ").append(Base64.encodeToString("Username:".getBytes(), false));
-			return false;
-		}
+    /**
+     *
+     */
+    @Override
+    public boolean auth(String clientInput, StringBuilder response, SMTPContext ctx) throws LoginFailedException {
+        StringTokenizer stk = new StringTokenizer(clientInput);
+        String token = stk.nextToken();
+        if (token.trim().equalsIgnoreCase("AUTH")) {
+            // The RFC2554 "initial-response" parameter must not be present
+            // The line must be in the form of "AUTH LOGIN"
+            if (!stk.nextToken().trim().equalsIgnoreCase("LOGIN")) {
+                // Mechanism mismatch
+                response.append("504 AUTH mechanism mismatch");
+                return true;
+            }
 
-		if (username == null)
-		{
-			byte[] decoded = Base64.decode(clientInput);
-			if (decoded == null)
-			{
-				throw new LoginFailedException();
-			}
-			this.username = new String(decoded);
-			response.append("334 ").append(Base64.encodeToString("Password:".getBytes(), false));
-			return false;
-		}
+            if (stk.hasMoreTokens()) {
+                // the client submitted an initial response
+                response.append("535 Initial response not allowed in AUTH LOGIN");
+                return true;
+            }
 
-		byte[] decoded = Base64.decode(clientInput);
-		if (decoded == null)
-		{
-			throw new LoginFailedException();
-		}
+            response.append("334 ").append(Base64.encodeToString("Username:".getBytes(), false));
+            return false;
+        }
 
-		this.password = new String(decoded);
-		
-		try
-		{
-			helper.login(username, password);
-			resetState();
-		}
-		catch (LoginFailedException lfe)
-		{
-			resetState();
-			throw lfe;
-		}
-		
-		ctx.setCredential(new Credential(username));
-		return true;
-	}
+        if (username == null) {
+            byte[] decoded = Base64.decode(clientInput);
+            if (decoded == null) {
+                throw new LoginFailedException();
+            }
+            this.username = new String(decoded);
+            response.append("334 ").append(Base64.encodeToString("Password:".getBytes(), false));
+            return false;
+        }
 
-	/**
-	 * 
-	 */
-	public void resetState()
-	{
-		this.username = null;
-		this.password = null;
-	}
+        byte[] decoded = Base64.decode(clientInput);
+        if (decoded == null) {
+            throw new LoginFailedException();
+        }
+
+        this.password = new String(decoded);
+
+        try {
+            helper.login(username, password);
+            resetState();
+        } catch (LoginFailedException lfe) {
+            resetState();
+            throw lfe;
+        }
+
+        ctx.setCredential(new Credential(username));
+        return true;
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void resetState() {
+        this.username = null;
+        this.password = null;
+    }
 }

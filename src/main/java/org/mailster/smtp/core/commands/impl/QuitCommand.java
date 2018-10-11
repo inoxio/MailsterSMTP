@@ -8,28 +8,25 @@ import org.mailster.smtp.core.commands.AbstractCommand;
 
 /**
  * The QUIT command implementation.
- * 
+ *
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  * @author Ian McFarland &lt;ian@neo.com&gt;
  * @author Jon Stevens
  */
-public class QuitCommand extends AbstractCommand
-{
-	public QuitCommand()
-	{
-		super("QUIT", "The QUIT command closes the SMTP session");
-	}
+public class QuitCommand extends AbstractCommand {
 
-	@Override
-	public boolean isAuthRequired()
-	{
-		return false;
-	}
+    public QuitCommand() {
+        super("QUIT", "The QUIT command closes the SMTP session");
+    }
 
-	public void execute(String commandString, IoSession ioSession, SMTPContext ctx) 
-		throws IOException
-	{
-		ctx.getSMTPState().quit();
-		sendResponse(ioSession, "221 Bye");		
-	}
+    @Override
+    public boolean isAuthRequired() {
+        return false;
+    }
+
+    @Override
+    public void execute(String commandString, IoSession ioSession, SMTPContext ctx) throws IOException {
+        ctx.getSMTPState().quit();
+        sendResponse(ioSession, "221 Bye");
+    }
 }

@@ -6,23 +6,15 @@ package org.mailster.smtp.core.auth;
  * @author Marco Trevisan <mrctrevisan@yahoo.it>
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
-public class LoginFailedException extends Exception
-{
-	private static final long serialVersionUID = -2568432389605367270L;
+public class LoginFailedException extends Exception {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public LoginFailedException()
-	{
-		super("Authentication failed");
-	}
-	
-	/** 
-	 * {@inheritDoc}
-	 */
-	public LoginFailedException(String msg)
-	{
-		super(msg);
-	}	
+    private static final long serialVersionUID = -2568432389605367270L;
+
+    public LoginFailedException() {
+        super("Authentication failed");
+    }
+
+    public LoginFailedException(String msg) {
+        super(msg);
+    }
 }

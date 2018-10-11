@@ -27,8 +27,7 @@ import java.net.ProtocolException;
  *
  * @version 1.0.0, 24/04/1999
  */
-public class CharTerminatedInputStream
-    extends InputStream {
+public class CharTerminatedInputStream extends InputStream {
 
     /**
      * The wrapped input stream
@@ -61,9 +60,8 @@ public class CharTerminatedInputStream
      * A constructor for this object that takes a stream to be wrapped
      * and a terminating character sequence.
      *
-     * @param in the <code>InputStream</code> to be wrapped
+     * @param in         the <code>InputStream</code> to be wrapped
      * @param terminator the array of characters that will terminate the stream.
-     *
      * @throws IllegalArgumentException if the terminator array is null or empty
      */
     public CharTerminatedInputStream(InputStream in, char[] terminator) {
@@ -76,7 +74,7 @@ public class CharTerminatedInputStream
         match = new int[terminator.length];
         buffer = new int[terminator.length];
         for (int i = 0; i < terminator.length; i++) {
-            match[i] = (int)terminator[i];
+            match[i] = (int) terminator[i];
         }
         this.in = in;
     }
@@ -85,9 +83,10 @@ public class CharTerminatedInputStream
      * Read a byte off this stream.
      *
      * @return the byte read off the stream
-     * @throws IOException if an IOException is encountered while reading off the stream
+     * @throws IOException       if an IOException is encountered while reading off the stream
      * @throws ProtocolException if the underlying stream returns -1 before the terminator is seen.
      */
+    @Override
     public int read() throws IOException {
         if (endFound) {
             //We've found the match to the terminator
@@ -159,7 +158,8 @@ public class CharTerminatedInputStream
         return b;
     }
 
-	public void close() throws IOException {
-		in.close();
-	}
+    @Override
+    public void close() throws IOException {
+        in.close();
+    }
 }

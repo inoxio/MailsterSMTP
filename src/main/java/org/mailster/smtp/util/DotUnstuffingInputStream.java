@@ -26,6 +26,7 @@ import java.io.InputStream;
  * transfer.
  */
 public class DotUnstuffingInputStream extends FilterInputStream {
+
     /**
      * An array to hold the last two bytes read off the stream.
      * This allows the stream to detect '\r\n' sequences even
@@ -42,6 +43,7 @@ public class DotUnstuffingInputStream extends FilterInputStream {
      *
      * @return the byte read from the stream
      */
+    @Override
     public int read() throws IOException {
         int b = in.read();
         if (b == '.' && last[0] == '\r' && last[1] == '\n') {
@@ -56,18 +58,18 @@ public class DotUnstuffingInputStream extends FilterInputStream {
     /**
      * Read through the stream, checking for '\r\n.'
      *
-     * @param b the byte array into which the bytes will be read
+     * @param b   the byte array into which the bytes will be read
      * @param off the offset into the byte array where the bytes will be inserted
      * @param len the maximum number of bytes to be read off the stream
      * @return the number of bytes read
      */
+    @Override
     public int read(byte[] b, int off, int len) throws IOException {
         if (b == null) {
             throw new NullPointerException();
         } else if (len == 0) {
             return 0;
-	} else if ((off < 0) || (off > b.length) || (len < 0) ||
-               ((off + len) > b.length) || ((off + len) < 0)) {
+        } else if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0)) {
             throw new IndexOutOfBoundsException();
         }
 
@@ -75,22 +77,23 @@ public class DotUnstuffingInputStream extends FilterInputStream {
         if (c == -1) {
             return -1;
         }
-        b[off] = (byte)c;
+        b[off] = (byte) c;
 
         int i = 1;
 
-        for (; i < len ; i++) {
+        for (; i < len; i++) {
             c = read();
             if (c == -1) {
                 break;
             }
-            b[off + i] = (byte)c;
+            b[off + i] = (byte) c;
         }
 
         return i;
     }
-    
-	public void close() throws IOException {
-		in.close();
-	}    
+
+    @Override
+    public void close() throws IOException {
+        in.close();
+    }
 }

@@ -12,24 +12,23 @@ import org.mailster.smtp.core.auth.LoginFailedException;
  * Will always allow to login without asking for any parameter.
  * This is a test purpose handler only and should not be used
  * in production environemnts.
- * 
+ *
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
- * @author Jeff Schnitzer 
+ * @author Jeff Schnitzer
  */
-public class DummyAuthenticationHandler implements AuthenticationHandler
-{
-	public List<String> getAuthenticationMechanisms()
-	{
-		return new ArrayList<>();
-	}
-	
-	public boolean auth(String clientInput, StringBuilder response, SMTPContext ctx) 
-		throws LoginFailedException
-	{
-		return true;
-	}
-	
-	public void resetState()
-	{
-	}
+public class DummyAuthenticationHandler implements AuthenticationHandler {
+
+    @Override
+    public List<String> getAuthenticationMechanisms() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public boolean auth(String clientInput, StringBuilder response, SMTPContext ctx) throws LoginFailedException {
+        return true;
+    }
+
+    @Override
+    public void resetState() {
+    }
 }
