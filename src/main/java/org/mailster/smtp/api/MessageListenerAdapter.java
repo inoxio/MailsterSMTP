@@ -18,6 +18,6 @@ public class MessageListenerAdapter implements MessageListener {
     }
 
     @Override
-    public void deliver(SessionContext ctx, String from, String recipient, InputStream data) throws IOException {
+    public void deliver(SessionContext ctx, String from, String recipient, InputStream data) {
     }
 }

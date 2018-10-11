@@ -153,7 +153,7 @@ public class SMTPDecoderContext {
         }
     }
 
-    private void append(IoBuffer in) throws CharacterCodingException {
+    private void append(IoBuffer in) {
         if (overflowPosition != 0) {
             discard(in);
         } else {

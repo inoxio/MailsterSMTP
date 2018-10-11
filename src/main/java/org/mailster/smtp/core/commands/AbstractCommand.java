@@ -89,7 +89,7 @@ abstract public class AbstractCommand implements Command {
         return name;
     }
 
-    protected void sendResponse(IoSession session, String response) throws IOException {
+    protected void sendResponse(IoSession session, String response) {
         SMTPConnectionHandler.sendResponse(session, response);
     }
 

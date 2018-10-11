@@ -374,7 +374,7 @@ public class SharedTmpFileInputStream extends BufferedInputStream implements Sha
         return (count - pos) + in_available();
     }
 
-    private int in_available() throws IOException {
+    private int in_available() {
         // XXX - overflow
         return (int) ((start + datalen) - (bufpos + count));
     }

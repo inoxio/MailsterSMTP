@@ -1,6 +1,5 @@
 package org.mailster.smtp.core;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -51,7 +50,7 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
         this.factory = factory;
     }
 
-    public static void sendResponse(IoSession session, String response) throws IOException {
+    public static void sendResponse(IoSession session, String response) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("S: " + response);
         }
@@ -89,7 +88,7 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
     }
 
     @Override
-	public void sessionCreated(IoSession session) {
+    public void sessionCreated(IoSession session) {
         updateNumberOfConnections(+1);
 
         if (session.getTransportMetadata().getSessionConfigType() == SocketSessionConfig.class) {
@@ -108,24 +107,11 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
         SMTPContext minaCtx = new SMTPContext(config, factory, session);
         session.setAttribute(CONTEXT_ATTRIBUTE, minaCtx);
 
-        try {
-            if (hasTooManyConnections()) {
-                LOG.debug("Too many connections to the SMTP server !");
-                sendResponse(session, "554 Transaction failed. Too many connections.");
-            } else {
-                sendResponse(session, "220 " + config.getHostName() + " ESMTP " + SMTPServerConfig.NAME);
-            }
-        } catch (IOException e1) {
-            try {
-                sendResponse(session, "450 Problem when connecting. Please try again later.");
-            } catch (IOException e) {
-            }
-
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Error on session creation", e1);
-            }
-
-            session.closeOnFlush();
+        if (hasTooManyConnections()) {
+            LOG.debug("Too many connections to the SMTP server !");
+            sendResponse(session, "554 Transaction failed. Too many connections.");
+        } else {
+            sendResponse(session, "220 " + config.getHostName() + " ESMTP " + SMTPServerConfig.NAME);
         }
     }
 
@@ -133,7 +119,7 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
      * Session closed.
      */
     @Override
-	public void sessionClosed(IoSession session) throws Exception {
+    public void sessionClosed(IoSession session) {
         updateNumberOfConnections(-1);
     }
 
@@ -141,17 +127,16 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
      * Sends a response telling that the session is idle and closes it.
      */
     @Override
-	public void sessionIdle(IoSession session, IdleStatus status) {
+    public void sessionIdle(IoSession session, IdleStatus status) {
         try {
             sendResponse(session, "421 Timeout waiting for data from client.");
-        } catch (IOException ioex) {
         } finally {
             session.closeOnFlush();
         }
     }
 
     @Override
-	public void exceptionCaught(IoSession session, Throwable cause) {
+    public void exceptionCaught(IoSession session, Throwable cause) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Exception occured :", cause);
         }
@@ -170,7 +155,6 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
                 // the message later.
                 sendResponse(session, "450 Problem attempting to execute commands. Please try again later.");
             }
-        } catch (IOException e) {
         } finally {
             if (fatal) {
                 session.closeOnFlush();
@@ -179,7 +163,7 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
     }
 
     @Override
-	public void messageReceived(IoSession session, Object message) throws Exception {
+    public void messageReceived(IoSession session, Object message) throws Exception {
         if (message == null) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("no more lines from client");

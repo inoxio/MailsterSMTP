@@ -24,7 +24,7 @@ public class DummyAuthenticationHandler implements AuthenticationHandler {
     }
 
     @Override
-    public boolean auth(String clientInput, StringBuilder response, SMTPContext ctx) throws LoginFailedException {
+    public boolean auth(String clientInput, StringBuilder response, SMTPContext ctx) {
         return true;
     }
 

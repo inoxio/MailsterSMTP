@@ -103,7 +103,7 @@ public class SMTPDecoder implements ProtocolDecoder {
     }
 
     @Override
-    public void finishDecode(IoSession session, ProtocolDecoderOutput out) throws Exception {
+    public void finishDecode(IoSession session, ProtocolDecoderOutput out) {
     }
 
     @Override

@@ -37,7 +37,7 @@ public class DefaultDeliveryHandler extends AbstractDeliveryHandler {
     }
 
     @Override
-    public void from(String from) throws RejectException {
+    public void from(String from) {
         this.from = from;
     }
 
