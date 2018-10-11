@@ -66,7 +66,7 @@ import javax.mail.internet.SharedInputStream;
  * This class has been modified to ensure that the temporary 
  * underlying file is deleted when last reference is gone or 
  * when JVM exits normally.
- * 
+ *
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
 public class SharedTmpFileInputStream extends BufferedInputStream
@@ -122,13 +122,13 @@ public class SharedTmpFileInputStream extends BufferedInputStream
         }
 
         SharedFile(File file) throws IOException {
-            this .sharedFile = file;
-            
+            this.sharedFile = file;
+
             // Always mark file to be deleted on exit in case streams
             // are not closed properly.
-            this .sharedFile.deleteOnExit();
-            
-            this .in = new RandomAccessFile(file, "r");            
+            this.sharedFile.deleteOnExit();
+
+            this.in = new RandomAccessFile(file, "r");
         }
 
         public RandomAccessFile open() {
@@ -160,7 +160,7 @@ public class SharedTmpFileInputStream extends BufferedInputStream
         }
 
         protected void finalize() throws Throwable {
-            super .finalize();
+            super.finalize();
             in.close();
         }
     }
@@ -182,7 +182,7 @@ public class SharedTmpFileInputStream extends BufferedInputStream
      * @param   file   the file
      */
     public SharedTmpFileInputStream(File file) throws IOException {
-        this (file, defaultBufferSize);
+        this(file, defaultBufferSize);
     }
 
     /**
@@ -192,7 +192,7 @@ public class SharedTmpFileInputStream extends BufferedInputStream
      * @param   file   the file
      */
     public SharedTmpFileInputStream(String file) throws IOException {
-        this (file, defaultBufferSize);
+        this(file, defaultBufferSize);
     }
 
     /**
@@ -205,7 +205,7 @@ public class SharedTmpFileInputStream extends BufferedInputStream
      */
     public SharedTmpFileInputStream(File file, int size)
             throws IOException {
-        super (null); // XXX - will it NPE?
+        super(null); // XXX - will it NPE?
         if (size <= 0)
             throw new IllegalArgumentException("Buffer size <= 0");
         init(new SharedFile(file), size);
@@ -221,18 +221,18 @@ public class SharedTmpFileInputStream extends BufferedInputStream
      */
     public SharedTmpFileInputStream(String file, int size)
             throws IOException {
-        super (null); // XXX - will it NPE?
+        super(null); // XXX - will it NPE?
         if (size <= 0)
             throw new IllegalArgumentException("Buffer size <= 0");
         init(new SharedFile(file), size);
     }
 
     private void init(SharedFile sf, int size) throws IOException {
-        this .sf = sf;
-        this .in = sf.open();
-        this .start = 0;
-        this .datalen = in.length(); // XXX - file can't grow
-        this .bufsize = size;
+        this.sf = sf;
+        this.in = sf.open();
+        this.start = 0;
+        this.datalen = in.length(); // XXX - file can't grow
+        this.bufsize = size;
         buf = new byte[size];
     }
 
@@ -240,15 +240,15 @@ public class SharedTmpFileInputStream extends BufferedInputStream
      * Used internally by the <code>newStream</code> method.
      */
     private SharedTmpFileInputStream(SharedFile sf, long start, long len,
-            int bufsize) {
-        super (null);
+                                     int bufsize) {
+        super(null);
         //this .master = false;
-        this .sf = sf;
-        this .in = sf.open();
-        this .start = start;
-        this .bufpos = start;
-        this .datalen = len;
-        this .bufsize = bufsize;
+        this.sf = sf;
+        this.in = sf.open();
+        this.start = start;
+        this.bufpos = start;
+        this.datalen = len;
+        this.bufsize = bufsize;
         buf = new byte[bufsize];
     }
 
@@ -427,7 +427,7 @@ public class SharedTmpFileInputStream extends BufferedInputStream
         return (int) ((start + datalen) - (bufpos + count));
     }
 
-    /** 
+    /**
      * See the general contract of the <code>mark</code>
      * method of <code>InputStream</code>.
      *
@@ -489,7 +489,7 @@ public class SharedTmpFileInputStream extends BufferedInputStream
             /*if (master)
                 sf.forceClose();
             else*/
-                sf.close();
+            sf.close();
         } finally {
             sf = null;
             in = null;
@@ -529,7 +529,7 @@ public class SharedTmpFileInputStream extends BufferedInputStream
             throw new IllegalArgumentException("start < 0");
         if (end == -1)
             end = datalen;
-        return new SharedTmpFileInputStream(sf, this .start + (int) start,
+        return new SharedTmpFileInputStream(sf, this.start + (int) start,
                 (int) (end - start), bufsize);
     }
 

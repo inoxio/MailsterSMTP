@@ -35,7 +35,7 @@ public class LoginAuthenticationHandler implements AuthenticationHandler
 	{
 		this.helper = helper;
 
-		authentificationMechanisms = new ArrayList<String>(1);
+		authentificationMechanisms = new ArrayList<>(1);
 		authentificationMechanisms.add("LOGIN");
 	}
 

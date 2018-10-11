@@ -32,8 +32,7 @@ public class DeliveryHandlerFactory
 	 */
 	public DeliveryHandlerFactory(Collection<MessageListener> listeners)
 	{
-		this.listeners = listeners == null ? 
-			new ArrayList<MessageListener>() : listeners;
+		this.listeners = listeners == null ? new ArrayList<>() : listeners;
 	}
 	
 	public synchronized void addAllListeners(Collection<MessageListener> listeners)
@@ -53,7 +52,7 @@ public class DeliveryHandlerFactory
 	
 	private synchronized ArrayList<MessageListener> copyListeners() 
 	{
-	    return new ArrayList<MessageListener>(listeners);
+	    return new ArrayList<>(listeners);
 	}
 	
 	public AbstractDeliveryHandler create(DeliveryContext ctx)

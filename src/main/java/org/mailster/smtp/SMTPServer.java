@@ -102,7 +102,7 @@ public class SMTPServer
 	
 	public SMTPServer(MessageListener listener)
 	{
-		List<MessageListener> listeners = new ArrayList<MessageListener>(1);
+		List<MessageListener> listeners = new ArrayList<>(1);
 		listeners.add(listener);
 		initInstance(listeners);
 	}

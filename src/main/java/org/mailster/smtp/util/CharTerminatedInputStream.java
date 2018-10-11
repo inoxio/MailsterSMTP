@@ -98,7 +98,7 @@ public class CharTerminatedInputStream
             int b = in.read();
             if (b == -1) {
                 //End of stream reached without seeing the terminator
-                throw new java.net.ProtocolException("pre-mature end of data");
+                throw new ProtocolException("pre-mature end of data");
             }
             if (b != match[0]) {
                 //this char is not the first char of the match

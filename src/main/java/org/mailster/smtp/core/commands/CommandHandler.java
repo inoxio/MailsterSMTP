@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CommandHandler
 {
-	private Map<String, Command> commandMap = new HashMap<String, Command>();
+	private Map<String, Command> commandMap = new HashMap<>();
 	private static final Logger LOG = LoggerFactory.getLogger(CommandHandler.class);
 	
 	/**

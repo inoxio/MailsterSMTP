@@ -20,7 +20,7 @@ public class DummyAuthenticationHandler implements AuthenticationHandler
 {
 	public List<String> getAuthenticationMechanisms()
 	{
-		return new ArrayList<String>();
+		return new ArrayList<>();
 	}
 	
 	public boolean auth(String clientInput, StringBuilder response, SMTPContext ctx) 

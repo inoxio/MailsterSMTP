@@ -31,7 +31,7 @@ public class PlainAuthenticationHandler implements AuthenticationHandler
 	{
 		this.helper = helper;
 
-		authentificationMechanisms = new ArrayList<String>(1);
+		authentificationMechanisms = new ArrayList<>(1);
 		authentificationMechanisms.add("PLAIN");
 	}
 

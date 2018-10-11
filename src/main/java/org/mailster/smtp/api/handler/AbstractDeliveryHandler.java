@@ -24,7 +24,7 @@ abstract public class AbstractDeliveryHandler
 {
 	private class SessionContextImpl implements SessionContext
 	{
-		private HashMap<String, Object> attrs = new HashMap<String, Object>();
+		private HashMap<String, Object> attrs = new HashMap<>();
 		
 		public SessionContextImpl() {
 		}

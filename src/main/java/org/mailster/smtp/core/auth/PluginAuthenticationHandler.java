@@ -23,12 +23,12 @@ public class PluginAuthenticationHandler implements AuthenticationHandler
 	/** Creates a new instance of PluginAuthenticationHandler */
 	public PluginAuthenticationHandler()
 	{
-		this.plugins = new ArrayList<AuthenticationHandler>();
+		this.plugins = new ArrayList<>();
 	}
 
 	public List<String> getAuthenticationMechanisms()
 	{
-		List<String> ret = new ArrayList<String>();
+		List<String> ret = new ArrayList<>();
 		for (AuthenticationHandler plugin : plugins)
 		{
 			ret.addAll(plugin.getAuthenticationMechanisms());

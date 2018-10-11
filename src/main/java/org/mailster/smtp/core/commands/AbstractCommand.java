@@ -28,7 +28,7 @@ abstract public class AbstractCommand implements Command
 
 	private String name;
 	private CommandHandler handler;
-	private static Map<String, HelpMessage> helpMessageMap = new HashMap<String, HelpMessage>();
+	private static Map<String, HelpMessage> helpMessageMap = new HashMap<>();
 	
 	public AbstractCommand(String name, String help)
 	{
@@ -112,7 +112,7 @@ abstract public class AbstractCommand implements Command
 	
 	protected String[] getArgs(String commandString)
 	{
-		List<String> strings = new ArrayList<String>();
+		List<String> strings = new ArrayList<>();
 		StringTokenizer st = new StringTokenizer(commandString);
 		
 		while (st.hasMoreTokens())

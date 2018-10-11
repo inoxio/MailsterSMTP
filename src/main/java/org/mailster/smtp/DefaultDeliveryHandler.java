@@ -31,7 +31,7 @@ public class DefaultDeliveryHandler
 	private static final Logger LOG = 
 		LoggerFactory.getLogger(DefaultDeliveryHandler.class);
 	
-	private List<Delivery> deliveries = new ArrayList<Delivery>();
+	private List<Delivery> deliveries = new ArrayList<>();
 	private String from;
 	
 	public DefaultDeliveryHandler(DeliveryContext ctx, AuthenticationHandler authHandler)
@@ -113,7 +113,7 @@ public class DefaultDeliveryHandler
 		}
 		
 		// Prevent concurrent modifications
-		List<Delivery> list = new ArrayList<Delivery>(this.deliveries);
+		List<Delivery> list = new ArrayList<>(this.deliveries);
 		
 		for (Delivery delivery : list)
 		{				

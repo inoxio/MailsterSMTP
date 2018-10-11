@@ -69,7 +69,7 @@ public class HelpCommand extends AbstractCommand
 
 	private void getFormattedCommandsList(StringBuilder sb)
 	{
-		Set<String> set = new TreeSet<String>(super.getHelp().keySet());
+		Set<String> set = new TreeSet<>(super.getHelp().keySet());
 		
 		for (String key : set)
 		{
