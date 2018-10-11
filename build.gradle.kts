@@ -21,7 +21,7 @@ dependencies {
     compile("org.slf4j:slf4j-api:1.7.25")
     // network
     compile("org.apache.mina:mina-core:2.0.19")
-    compile("javax.mail:mail:1.4.7")
+    compile("com.sun.mail:javax.mail:1.6.2")
     compile("commons-validator:commons-validator:1.6")
     // test
     testCompile("javax.activation:activation:1.1.1")
