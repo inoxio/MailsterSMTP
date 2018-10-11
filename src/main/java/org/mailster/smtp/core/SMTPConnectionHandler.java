@@ -59,7 +59,7 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
             session.write(response);
         }
 
-        SMTPContext minaCtx = (SMTPContext) session.getAttribute(CONTEXT_ATTRIBUTE);
+        var minaCtx = (SMTPContext) session.getAttribute(CONTEXT_ATTRIBUTE);
         if (!minaCtx.getSMTPState().isActive()) {
             session.closeOnFlush();
         }
@@ -76,7 +76,7 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
      * Update the number of active connections.
      */
     private void updateNumberOfConnections(int delta) {
-        int count = numberOfConnections.addAndGet(delta);
+        var count = numberOfConnections.addAndGet(delta);
         LOG.debug("Active connections count = {}", count);
     }
 
@@ -104,7 +104,7 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
         // Init protocol internals
         LOG.debug("SMTP connection count: {}", getNumberOfConnections());
 
-        SMTPContext minaCtx = new SMTPContext(config, factory, session);
+        var minaCtx = new SMTPContext(config, factory, session);
         session.setAttribute(CONTEXT_ATTRIBUTE, minaCtx);
 
         if (hasTooManyConnections()) {
@@ -141,7 +141,7 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
             LOG.debug("Exception occured :", cause);
         }
 
-        boolean fatal = true;
+        var fatal = true;
 
         try {
             if (cause instanceof BufferDataException) {
@@ -178,7 +178,7 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
             return;
         }
 
-        SMTPContext minaCtx = (SMTPContext) session.getAttribute(CONTEXT_ATTRIBUTE);
+        var minaCtx = (SMTPContext) session.getAttribute(CONTEXT_ATTRIBUTE);
 
         if (message instanceof InputStream) {
             minaCtx.setInputStream((InputStream) message);
@@ -190,7 +190,7 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
                 sendResponse(session, "552 Too much mail data");
             }
         } else {
-            String line = (String) message;
+            var line = (String) message;
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("C: " + line);
@@ -202,7 +202,7 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
                     .getAuthenticationMechanisms()
                     .isEmpty()) {
                 // Per RFC 2554
-                Command cmd = this.commandHandler.getCommandFromString(line);
+                var cmd = this.commandHandler.getCommandFromString(line);
 
                 if (cmd.isAuthRequired()) {
                     sendResponse(session, "530 Authentication required");

@@ -27,7 +27,7 @@ public class HelpCommand extends AbstractCommand {
 
     @Override
     public void execute(String commandString, IoSession ioSession, SMTPContext ctx) throws IOException {
-        String args = getArgPredicate(commandString);
+        var args = getArgPredicate(commandString);
         if ("".equals(args)) {
             sendResponse(ioSession, getCommandMessage(ctx.getSMTPServerConfig()));
             return;
@@ -41,7 +41,7 @@ public class HelpCommand extends AbstractCommand {
     }
 
     private String getCommandMessage(SMTPServerConfig cfg) {
-        StringBuilder response = new StringBuilder();
+        var response = new StringBuilder();
         response.append("214-This is ");
         response.append(cfg.getNameVersion());
         response.append(" server running on ");
@@ -63,7 +63,7 @@ public class HelpCommand extends AbstractCommand {
     private void getFormattedCommandsList(StringBuilder sb) {
         Set<String> set = new TreeSet<>(super.getHelp().keySet());
 
-        for (String key : set) {
+        for (var key : set) {
             sb.append("214-  ");
             sb.append(key);
             sb.append("\r\n");

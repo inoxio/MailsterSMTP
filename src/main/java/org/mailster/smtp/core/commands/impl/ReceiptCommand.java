@@ -26,21 +26,21 @@ public class ReceiptCommand extends AbstractCommand {
 
     @Override
     public void execute(String commandString, IoSession ioSession, SMTPContext ctx) throws IOException {
-        SMTPState smtpState = ctx.getSMTPState();
+        var smtpState = ctx.getSMTPState();
         if (!smtpState.getHasSender()) {
             sendResponse(ioSession, "503 Error: need MAIL command");
             return;
         }
 
-        int max = ctx.getSMTPServerConfig().getMaxRecipients();
+        var max = ctx.getSMTPServerConfig().getMaxRecipients();
         if (max > -1 && smtpState.getRecipientCount() >= max) {
             sendResponse(ioSession, "452 Too many recipients");
             return;
         }
 
-        String args = getArgPredicate(commandString);
+        var args = getArgPredicate(commandString);
         if (args.toUpperCase().startsWith("TO:")) {
-            String recipientAddress = extractEmailAddress(args, 3);
+            var recipientAddress = extractEmailAddress(args, 3);
             if (isValidEmailAddress(recipientAddress)) {
                 try {
                     ctx.getDeliveryHandler().recipient(recipientAddress);

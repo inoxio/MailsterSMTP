@@ -26,7 +26,7 @@ public class AllSchemesAuthenticationHandler implements AuthenticationHandlerFac
 
     @Override
     public AuthenticationHandler create() {
-        PluginAuthenticationHandler ret = new PluginAuthenticationHandler();
+        var ret = new PluginAuthenticationHandler();
         ret.addPlugin(new PlainAuthenticationHandler(validator));
         ret.addPlugin(new LoginAuthenticationHandler(validator));
         return ret;

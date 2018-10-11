@@ -27,7 +27,7 @@ public class HeloCommand extends AbstractCommand {
 
     @Override
     public void execute(String commandString, IoSession ioSession, SMTPContext ctx) throws IOException {
-        String[] args = getArgs(commandString);
+        var args = getArgs(commandString);
         if (args.length < 2) {
             sendResponse(ioSession, "501 Syntax: HELO <hostname>");
             return;

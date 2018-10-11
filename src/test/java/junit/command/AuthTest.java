@@ -53,10 +53,10 @@ public class AuthTest extends ServerTestCase {
         send("AUTH PLAIN");
         expect("334");
 
-        String authString = new String(new byte[]{0}) + REQUIRED_USERNAME + new String(
+        var authString = new String(new byte[]{0}) + REQUIRED_USERNAME + new String(
                 new byte[]{0}) + REQUIRED_PASSWORD;
 
-        String enc_authString = Base64.encodeToString(authString.getBytes(), false);
+        var enc_authString = Base64.encodeToString(authString.getBytes(), false);
         send(enc_authString);
         expect("235");
 
@@ -89,7 +89,7 @@ public class AuthTest extends ServerTestCase {
         send("AUTH LOGIN");
         expect("334");
 
-        String enc_username = Base64.encodeToString(REQUIRED_USERNAME.getBytes(), false);
+        var enc_username = Base64.encodeToString(REQUIRED_USERNAME.getBytes(), false);
         send(enc_username);
         expect("334");
 
@@ -102,7 +102,7 @@ public class AuthTest extends ServerTestCase {
         send(enc_username);
         expect("334");
 
-        String enc_pwd = Base64.encodeToString(REQUIRED_PASSWORD.getBytes(), false);
+        var enc_pwd = Base64.encodeToString(REQUIRED_PASSWORD.getBytes(), false);
         send(enc_pwd);
         expect("235");
 

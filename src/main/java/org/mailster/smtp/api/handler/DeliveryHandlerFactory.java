@@ -62,9 +62,9 @@ public class DeliveryHandlerFactory {
 
     private AbstractDeliveryHandler create(DeliveryContext ctx, Class<? extends AbstractDeliveryHandler> c) {
         try {
-            Constructor<? extends AbstractDeliveryHandler> cstr = c.getConstructor(DeliveryContext.class,
-                                                                                   AuthenticationHandler.class);
-            AbstractDeliveryHandler handler = cstr.newInstance(ctx, getAuthenticationHandler());
+            var cstr = c.getConstructor(DeliveryContext.class,
+                                        AuthenticationHandler.class);
+            var handler = cstr.newInstance(ctx, getAuthenticationHandler());
             handler.setListeners(copyListeners());
 
             return handler;

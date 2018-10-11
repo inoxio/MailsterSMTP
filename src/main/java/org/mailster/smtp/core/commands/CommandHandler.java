@@ -28,7 +28,7 @@ public class CommandHandler {
      * Populates a default set of commands based with the BuiltinCommandRegistry commands.
      */
     public CommandHandler() {
-        for (BuiltinCommandRegistry entry : BuiltinCommandRegistry.values()) {
+        for (var entry : BuiltinCommandRegistry.values()) {
             addCommand(entry.getCommand());
         }
     }
@@ -62,7 +62,7 @@ public class CommandHandler {
      */
     public void handleCommand(String cmdString, IoSession session, SMTPContext ctx) throws IOException {
         try {
-            Command cmd = getCommandFromString(cmdString);
+            var cmd = getCommandFromString(cmdString);
             cmd.execute(cmdString, session, ctx);
         } catch (CommandException e) {
             SMTPConnectionHandler.sendResponse(session, "500 " + e.getMessage());
@@ -73,7 +73,7 @@ public class CommandHandler {
      * Executes an auth command.
      */
     public void handleAuthChallenge(String commandString, IoSession session, SMTPContext ctx) throws SocketTimeoutException, IOException {
-        Command cmd = this.commandMap.get(AuthCommand.VERB);
+        var cmd = this.commandMap.get(AuthCommand.VERB);
         cmd.execute(commandString, session, ctx);
     }
 
@@ -83,9 +83,9 @@ public class CommandHandler {
      * @return The command object.
      */
     public Command getCommandFromString(String cmdString) throws UnknownCommandException, InvalidCommandNameException {
-        String verb = toVerb(cmdString);
+        var verb = toVerb(cmdString);
 
-        Command cmd = this.commandMap.get(verb);
+        var cmd = this.commandMap.get(verb);
         if (cmd == null) {
             throw new UnknownCommandException("Command not implemented");
         }
@@ -98,7 +98,7 @@ public class CommandHandler {
             throw new InvalidCommandNameException("Syntax error");
         }
 
-        StringTokenizer st = new StringTokenizer(cmd);
+        var st = new StringTokenizer(cmd);
 
         if (!st.hasMoreTokens()) {
             throw new InvalidCommandNameException("Syntax error");

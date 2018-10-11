@@ -23,8 +23,8 @@ public class StartStopTest extends TestCase {
         var counter = 0;
 
         // when
-        for (int i = 0; i < 10; i++) {
-            SMTPServer server = new SMTPServer();
+        for (var i = 0; i < 10; i++) {
+            var server = new SMTPServer();
             server.setPort(SocketUtils.findAvailableTcpPort());
 
             server.start();
@@ -38,8 +38,8 @@ public class StartStopTest extends TestCase {
     }
 
     public void testMultipleStartStopWithSameInstance() {
-        SMTPServer server = new SMTPServer();
-        for (int i = 0; i < 10; i++) {
+        var server = new SMTPServer();
+        for (var i = 0; i < 10; i++) {
             server.setPort(SocketUtils.findAvailableTcpPort());
             server.start();
             server.stop();
@@ -47,8 +47,8 @@ public class StartStopTest extends TestCase {
     }
 
     public void testShutdown() {
-        boolean failed = false;
-        SMTPServer server = new SMTPServer();
+        var failed = false;
+        var server = new SMTPServer();
         server.setPort(SocketUtils.findAvailableTcpPort());
         server.start();
         server.stop();

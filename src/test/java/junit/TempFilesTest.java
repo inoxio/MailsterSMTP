@@ -20,8 +20,8 @@ import wiser.WiserMessage;
 public class TempFilesTest extends TestCase {
 
     public void testTmpFileStreams() throws Exception {
-        File f = new File("file.tmp");
-        FileOutputStream fos = new FileOutputStream(f);
+        var f = new File("file.tmp");
+        var fos = new FileOutputStream(f);
         byte data[] = "Hello this is test data\r\n".getBytes();
         fos.write(data);
         fos.flush();
@@ -29,10 +29,10 @@ public class TempFilesTest extends TestCase {
 
         assertTrue(f.exists());
 
-        SharedTmpFileInputStream st = new SharedTmpFileInputStream(f);
-        InputStream in1 = st.newStream(0, -1);
-        InputStream in2 = st.newStream(0, -1);
-        InputStream in3 = st.newStream(2, -1);
+        var st = new SharedTmpFileInputStream(f);
+        var in1 = st.newStream(0, -1);
+        var in2 = st.newStream(0, -1);
+        var in3 = st.newStream(2, -1);
 
         // test basic access to stream
         assertEquals(data[0], st.read());
@@ -44,10 +44,10 @@ public class TempFilesTest extends TestCase {
 
         // test independency between streams
         assertEquals(data[0], in2.read());
-        byte[] l = new byte[3];
+        var l = new byte[3];
         assertEquals(3, in2.read(l));
 
-        for (int i = 0; i < 3; i++) {
+        for (var i = 0; i < 3; i++) {
             assertEquals(data[i + 1], l[i]);
         }
 
@@ -63,7 +63,7 @@ public class TempFilesTest extends TestCase {
         assertTrue(f.exists());
 
         // Test if file is finally closed when no more references are open
-        WiserMessage msg = new WiserMessage("sender", "receiver", in1);
+        var msg = new WiserMessage("sender", "receiver", in1);
         msg.close();
         assertFalse(f.exists());
     }

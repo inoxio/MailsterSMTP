@@ -55,7 +55,7 @@ public class SMTPClientTest extends TestCase {
         wiser = new Wiser(SocketUtils.findAvailableTcpPort());
         wiser.start();
 
-        Properties props = new Properties();
+        var props = new Properties();
         props.setProperty("mail.smtp.host", "localhost");
         props.setProperty("mail.smtp.port", Integer.toString(wiser.getPort()));
         session = Session.getInstance(props);
@@ -70,7 +70,7 @@ public class SMTPClientTest extends TestCase {
     public void testMultipleRecipients() throws Exception {
 
         // given
-        MimeMessage message = new MimeMessage(this.session);
+        var message = new MimeMessage(this.session);
         message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
         message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone2@anywhere.com"));
         message.setFrom(new InternetAddress("someone@somewhereelse.com"));
@@ -87,7 +87,7 @@ public class SMTPClientTest extends TestCase {
     public void testLargeMessage() throws Exception {
 
         // given
-        MimeMessage message = new MimeMessage(this.session);
+        var message = new MimeMessage(this.session);
         message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
         message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone2@anywhere.com"));
         message.setFrom(new InternetAddress("someone@somewhereelse.com"));
@@ -106,8 +106,8 @@ public class SMTPClientTest extends TestCase {
     public void testUtf8EightBitMessage() throws Exception {
 
         // given
-        String body = "\u00a4uro ma\u00f1ana";
-        MimeMessage message = new MimeMessage(this.session);
+        var body = "\u00a4uro ma\u00f1ana";
+        var message = new MimeMessage(this.session);
         message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
         message.setFrom(new InternetAddress("someone@somewhereelse.com"));
         message.setSubject("hello");
@@ -124,8 +124,8 @@ public class SMTPClientTest extends TestCase {
     public void testUtf16EightBitMessage() throws Exception {
 
         // given
-        String body = "\u3042\u3044\u3046\u3048\u304a";
-        MimeMessage message = new MimeMessage(this.session);
+        var body = "\u3042\u3044\u3046\u3048\u304a";
+        var message = new MimeMessage(this.session);
         message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
         message.setFrom(new InternetAddress("someone@somewhereelse.com"));
         message.setSubject("hello");
@@ -142,8 +142,8 @@ public class SMTPClientTest extends TestCase {
     public void testIso88591EightBitMessage() throws Exception {
 
         // given
-        String body = "ma\u00f1ana";    // spanish ene (ie, n with diacritical tilde)
-        MimeMessage message = new MimeMessage(this.session);
+        var body = "ma\u00f1ana";    // spanish ene (ie, n with diacritical tilde)
+        var message = new MimeMessage(this.session);
         message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
         message.setFrom(new InternetAddress("someone@somewhereelse.com"));
         message.setSubject("hello");
@@ -160,8 +160,8 @@ public class SMTPClientTest extends TestCase {
     public void testIso885915EightBitMessage() throws Exception {
 
         // given
-        String body = "\0xa4uro";    // should be the euro symbol
-        MimeMessage message = new MimeMessage(this.session);
+        var body = "\0xa4uro";    // should be the euro symbol
+        var message = new MimeMessage(this.session);
         message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
         message.setFrom(new InternetAddress("someone@somewhereelse.com"));
         message.setSubject("hello");
@@ -178,8 +178,8 @@ public class SMTPClientTest extends TestCase {
     public void testIso2022JPEightBitMessage() throws Exception {
 
         // given
-        String body = "\u3042\u3044\u3046\u3048\u304a"; // some Japanese letters
-        MimeMessage message = new MimeMessage(this.session);
+        var body = "\u3042\u3044\u3046\u3048\u304a"; // some Japanese letters
+        var message = new MimeMessage(this.session);
         message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
         message.setFrom(new InternetAddress("someone@somewhereelse.com"));
         message.setSubject("hello");
@@ -196,28 +196,28 @@ public class SMTPClientTest extends TestCase {
     public void testPreservingCRLF() throws Exception {
 
         // given
-        String body = "\n\nKeep these pesky carriage returns\n\n";
+        var body = "\n\nKeep these pesky carriage returns\n\n";
 
         // when
         testCRLFEncodingMessage(body);
 
         // then
         Thread.sleep(500);
-        String received = this.wiser.getMessages().get(0).getMimeMessage().getContent().toString();
+        var received = this.wiser.getMessages().get(0).getMimeMessage().getContent().toString();
         assertEquals(body, received);
     }
 
     public void testPreservingCRLFHeavily() throws Exception {
 
         // given
-        String body = "\r\n\r\nKeep these\r\npesky\r\n\r\ncarriage returns\r\n";
+        var body = "\r\n\r\nKeep these\r\npesky\r\n\r\ncarriage returns\r\n";
 
         // when
         testCRLFEncodingMessage(body);
 
         // then
         Thread.sleep(500);
-        String received = this.wiser.getMessages().get(0).getMimeMessage().getContent().toString();
+        var received = this.wiser.getMessages().get(0).getMimeMessage().getContent().toString();
         assertEquals(body, received);
     }
 
@@ -247,10 +247,10 @@ public class SMTPClientTest extends TestCase {
     }
 
     public void testBinaryEightBitMessage() throws Exception {
-        byte[] body = new byte[64];
+        var body = new byte[64];
         new Random().nextBytes(body);
 
-        MimeMessage message = new MimeMessage(this.session);
+        var message = new MimeMessage(this.session);
         message.addRecipient(Message.RecipientType.TO, new InternetAddress("anyone@anywhere.com"));
         message.setFrom(new InternetAddress("someone@somewhereelse.com"));
         message.setSubject("hello");
@@ -259,9 +259,9 @@ public class SMTPClientTest extends TestCase {
 
         Transport.send(message);
 
-        InputStream in = this.wiser.getMessages().get(0).getMimeMessage().getInputStream();
-        ByteArrayOutputStream tmp = new ByteArrayOutputStream();
-        byte[] buf = new byte[64];
+        var in = this.wiser.getMessages().get(0).getMimeMessage().getInputStream();
+        var tmp = new ByteArrayOutputStream();
+        var buf = new byte[64];
         int n;
         while ((n = in.read(buf)) != -1) {
             tmp.write(buf, 0, n);

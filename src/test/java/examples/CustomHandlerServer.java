@@ -12,7 +12,7 @@ import org.mailster.smtp.api.handler.SessionContext;
 public class CustomHandlerServer {
 
     public static void main(String[] args) {
-        SMTPServer server = new SMTPServer(new MessageListenerAdapter() {
+        var server = new SMTPServer(new MessageListenerAdapter() {
             @Override
             public void deliver(SessionContext ctx, String from, String recipient, InputStream data) {
                 System.out.println("New message received");

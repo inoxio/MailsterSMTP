@@ -43,7 +43,7 @@ public class Wiser implements MessageListener {
      * A main() for this class. Starts up the server.
      */
     public static void main(String[] args) {
-        Wiser wiser = new Wiser(25);
+        var wiser = new Wiser(25);
         wiser.start();
     }
 
@@ -117,7 +117,7 @@ public class Wiser implements MessageListener {
      */
     @Override
     public void deliver(SessionContext ctx, String from, String recipient, InputStream data) throws IOException {
-        WiserMessage msg = new WiserMessage(from, recipient, data);
+        var msg = new WiserMessage(from, recipient, data);
         this.queueMessage(msg);
     }
 

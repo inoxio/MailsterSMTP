@@ -50,8 +50,8 @@ public class SMTPDecoderContext {
     }
 
     private static byte[] asArray(IoBuffer b) {
-        int len = b.remaining();
-        byte[] array = new byte[len];
+        var len = b.remaining();
+        var array = new byte[len];
         b.get(array, 0, len);
 
         return array;
@@ -105,7 +105,7 @@ public class SMTPDecoderContext {
     }
 
     private void write(byte[] src) throws IOException {
-        int predicted = this.thresholdReached ? 0 : this.buf.position() + src.length;
+        var predicted = this.thresholdReached ? 0 : this.buf.position() + src.length;
 
         // Checks whether reading count bytes would cross the limit.
         if (this.thresholdReached || predicted > decoder.getThreshold()) {
@@ -157,7 +157,7 @@ public class SMTPDecoderContext {
         if (overflowPosition != 0) {
             discard(in);
         } else {
-            int pos = buf.position();
+            var pos = buf.position();
             if ((pos + in.remaining()) > decoder.getMaxLineLength()) {
                 overflowPosition = pos;
                 buf.clear();

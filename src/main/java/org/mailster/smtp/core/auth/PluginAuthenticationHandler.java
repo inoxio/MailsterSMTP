@@ -27,7 +27,7 @@ public class PluginAuthenticationHandler implements AuthenticationHandler {
     @Override
     public List<String> getAuthenticationMechanisms() {
         List<String> ret = new ArrayList<>();
-        for (AuthenticationHandler plugin : plugins) {
+        for (var plugin : plugins) {
             ret.addAll(plugin.getAuthenticationMechanisms());
         }
         return ret;
@@ -35,7 +35,7 @@ public class PluginAuthenticationHandler implements AuthenticationHandler {
 
     @Override
     public boolean auth(String clientInput, StringBuilder response, SMTPContext ctx) throws LoginFailedException {
-        StringTokenizer stk = new StringTokenizer(clientInput);
+        var stk = new StringTokenizer(clientInput);
         if (stk.nextToken().equalsIgnoreCase("AUTH")) {
             resetState();
             activateHandler(stk.nextToken().toUpperCase());
@@ -52,7 +52,7 @@ public class PluginAuthenticationHandler implements AuthenticationHandler {
     }
 
     private void activateHandler(final String mechanism) {
-        for (AuthenticationHandler plugin : plugins) {
+        for (var plugin : plugins) {
             if (plugin.getAuthenticationMechanisms().contains(mechanism)) {
                 setActiveHandler(plugin);
                 return;

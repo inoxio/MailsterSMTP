@@ -60,7 +60,7 @@ public class Client implements Closeable {
      * the specified string.
      */
     public void expect(String expect) throws Exception {
-        String response = this.readResponse();
+        var response = this.readResponse();
         if (!response.startsWith(expect)) {
             throw new Exception("Got: " + response + " Expected: " + expect);
         }
@@ -71,10 +71,10 @@ public class Client implements Closeable {
      * Newlines are included.
      */
     private String readResponse() throws Exception {
-        StringBuilder builder = new StringBuilder();
-        boolean done = false;
+        var builder = new StringBuilder();
+        var done = false;
         while (!done) {
-            String line = this.reader.readLine();
+            var line = this.reader.readLine();
 
             if (line == null) {
                 break;

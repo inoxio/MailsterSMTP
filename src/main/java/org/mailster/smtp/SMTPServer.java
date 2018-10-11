@@ -124,7 +124,7 @@ public class SMTPServer {
             acceptor = new NioSocketAcceptor(Runtime.getRuntime().availableProcessors() + 1);
 
             acceptor.getSessionConfig().setReuseAddress(true);
-            DefaultIoFilterChainBuilder chain = acceptor.getFilterChain();
+            var chain = acceptor.getFilterChain();
 
             if (LOG.isTraceEnabled()) {
                 chain.addLast("logger", new LoggingFilter());

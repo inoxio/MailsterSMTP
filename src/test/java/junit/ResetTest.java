@@ -32,10 +32,10 @@ public class ResetTest {
             public void deliver(SessionContext ctx, String from, String recipient, InputStream data) throws IOException {
                 super.deliver(ctx, from, recipient, data);
                 receivedMailsCount++;
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                byte[] array = new byte[10000];
-                int size = 0;
-                for (int i = data.read(array); i != -1; i = data.read(array)) {
+                var bos = new ByteArrayOutputStream();
+                var array = new byte[10000];
+                var size = 0;
+                for (var i = data.read(array); i != -1; i = data.read(array)) {
                     bos.write(array, 0, i);
                     size += i;
                 }
@@ -53,7 +53,7 @@ public class ResetTest {
         wiser.start();
         wiser.setDataDeferredSize(2 * 1024);
 
-        try (Client c = new Client("localhost", wiser.getPort())) {
+        try (var c = new Client("localhost", wiser.getPort())) {
             c.expect("220");
             c.send("HELO foo.com");
             c.expect("250");
@@ -89,10 +89,10 @@ public class ResetTest {
     }
 
     private String generateMailContent(String subject, int size, char c) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        var bos = new ByteArrayOutputStream();
         bos.write(("Subject: " + subject + "\r\n\r\n").getBytes());
 
-        for (int i = 0; i < size; i++) {
+        for (var i = 0; i < size; i++) {
             if ((i % 70) == 69) {
                 bos.write("\r\n".getBytes());
             }

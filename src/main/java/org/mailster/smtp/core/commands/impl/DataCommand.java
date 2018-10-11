@@ -23,7 +23,7 @@ public class DataCommand extends AbstractCommand {
 
     @Override
     public void execute(String commandString, IoSession ioSession, SMTPContext ctx) throws IOException {
-        SMTPState smtpState = ctx.getSMTPState();
+        var smtpState = ctx.getSMTPState();
 
         if (!smtpState.getHasSender()) {
             sendResponse(ioSession, "503 Error: need MAIL command");

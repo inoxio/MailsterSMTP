@@ -24,7 +24,7 @@ public class MailCommand extends AbstractCommand {
 
     @Override
     public void execute(String commandString, IoSession ioSession, SMTPContext ctx) throws IOException {
-        SMTPState smtpState = ctx.getSMTPState();
+        var smtpState = ctx.getSMTPState();
         if (!smtpState.getHasSeenHelo()) {
             sendResponse(ioSession, "503 Error: send HELO/EHLO first");
         } else if (smtpState.getHasSender()) {
@@ -35,14 +35,14 @@ public class MailCommand extends AbstractCommand {
                 return;
             }
 
-            String args = getArgPredicate(commandString);
+            var args = getArgPredicate(commandString);
             if (!args.toUpperCase().startsWith("FROM:")) {
                 sendResponse(ioSession, "501 Syntax: MAIL FROM: <address>  Error in parameters: \"" + getArgPredicate(
                         commandString) + "\"");
                 return;
             }
 
-            String emailAddress = extractEmailAddress(args, 5);
+            var emailAddress = extractEmailAddress(args, 5);
             if (isValidEmailAddress(emailAddress)) {
                 try {
                     ctx.getDeliveryHandler().from(emailAddress);

@@ -44,7 +44,7 @@ abstract public class AbstractCommand implements Command {
     }
 
     protected static void getTokenizedString(StringBuilder sb, Collection<String> items, String delim) {
-        for (Iterator<String> it = items.iterator(); it.hasNext(); ) {
+        for (var it = items.iterator(); it.hasNext(); ) {
             sb.append(it.next());
             if (it.hasNext()) {
                 sb.append(delim);
@@ -61,7 +61,7 @@ abstract public class AbstractCommand implements Command {
     }
 
     public HelpMessage getHelp(String commandName) throws CommandException {
-        HelpMessage msg = helpMessageMap.get(commandName.toUpperCase());
+        var msg = helpMessageMap.get(commandName.toUpperCase());
         if (msg == null) {
             throw new CommandException();
         }
@@ -103,7 +103,7 @@ abstract public class AbstractCommand implements Command {
 
     protected String[] getArgs(String commandString) {
         List<String> strings = new ArrayList<>();
-        StringTokenizer st = new StringTokenizer(commandString);
+        var st = new StringTokenizer(commandString);
 
         while (st.hasMoreTokens()) {
             strings.add(st.nextToken());
@@ -113,7 +113,7 @@ abstract public class AbstractCommand implements Command {
     }
 
     protected String extractEmailAddress(String args, int subcommandOffset) {
-        String address = args.substring(subcommandOffset).trim();
+        var address = args.substring(subcommandOffset).trim();
         if (address.indexOf('<') == 0) {
             address = address.substring(1, address.indexOf('>'));
         }

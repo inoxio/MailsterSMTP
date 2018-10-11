@@ -63,23 +63,23 @@ public class BigAttachmentTest extends TestCase {
     }
 
     public void testAttachments() throws Exception {
-        Properties props = System.getProperties();
+        var props = System.getProperties();
         props.setProperty("mail.smtp.host", "localhost");
         props.setProperty("mail.smtp.port", String.valueOf(wiser.getPort()));
-        Session session = Session.getInstance(props);
+        var session = Session.getInstance(props);
 
-        MimeMessage baseMsg = new MimeMessage(session);
-        MimeBodyPart bp1 = new MimeBodyPart();
+        var baseMsg = new MimeMessage(session);
+        var bp1 = new MimeBodyPart();
         bp1.setHeader("Content-Type", "text/plain");
         bp1.setContent("Hello World!!!", "text/plain; charset=\"ISO-8859-1\"");
 
-        FileDataSource fileAttachment = new FileDataSource(BIGFILE_PATH);
+        var fileAttachment = new FileDataSource(BIGFILE_PATH);
 
         // Can't test if file not found
         assertTrue(fileAttachment.getFile().exists());
 
         // Attach the file
-        MimeBodyPart bp2 = new MimeBodyPart();
+        var bp2 = new MimeBodyPart();
         bp2.setDataHandler(new DataHandler(fileAttachment));
         bp2.setFileName(fileAttachment.getName());
 
@@ -99,11 +99,11 @@ public class BigAttachmentTest extends TestCase {
         }
 
         final var compareFile = File.createTempFile("attached", ".tmp");
-        try (WiserMessage msg = wiser.getMessages().get(0)) {
+        try (var msg = wiser.getMessages().get(0)) {
 
             assertEquals(1, wiser.getMessages().size());
             assertEquals("success@example.org", msg.getEnvelopeReceiver());
-            FileOutputStream fos = new FileOutputStream(compareFile);
+            var fos = new FileOutputStream(compareFile);
             ((MimeMultipart) msg.getMimeMessage().getContent()).getBodyPart(1).getDataHandler().writeTo(fos);
             fos.close();
             assertTrue(checkIntegrity(new File(BIGFILE_PATH), compareFile));
@@ -114,14 +114,14 @@ public class BigAttachmentTest extends TestCase {
     }
 
     private boolean checkIntegrity(File src, File dest) throws IOException, NoSuchAlgorithmException {
-        BufferedInputStream ins = new BufferedInputStream(new FileInputStream(src));
-        BufferedInputStream ind = new BufferedInputStream(new FileInputStream(dest));
-        MessageDigest md1 = MessageDigest.getInstance("MD5");
-        MessageDigest md2 = MessageDigest.getInstance("MD5");
+        var ins = new BufferedInputStream(new FileInputStream(src));
+        var ind = new BufferedInputStream(new FileInputStream(dest));
+        var md1 = MessageDigest.getInstance("MD5");
+        var md2 = MessageDigest.getInstance("MD5");
 
-        int r = 0;
-        byte[] buf1 = new byte[BUFFER_SIZE];
-        byte[] buf2 = new byte[BUFFER_SIZE];
+        var r = 0;
+        var buf1 = new byte[BUFFER_SIZE];
+        var buf2 = new byte[BUFFER_SIZE];
 
         while (r != -1) {
             r = ins.read(buf1);

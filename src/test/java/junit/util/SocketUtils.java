@@ -195,7 +195,7 @@ public class SocketUtils {
             @Override
             protected boolean isPortAvailable(int port) {
                 try {
-                    ServerSocket serverSocket = ServerSocketFactory.getDefault()
+                    var serverSocket = ServerSocketFactory.getDefault()
                             .createServerSocket(port, 1, InetAddress.getByName("localhost"));
                     serverSocket.close();
                     return true;
@@ -209,7 +209,7 @@ public class SocketUtils {
             @Override
             protected boolean isPortAvailable(int port) {
                 try {
-                    DatagramSocket socket = new DatagramSocket(port, InetAddress.getByName("localhost"));
+                    var socket = new DatagramSocket(port, InetAddress.getByName("localhost"));
                     socket.close();
                     return true;
                 } catch (Exception ex) {
@@ -233,7 +233,7 @@ public class SocketUtils {
          * @return a random port number within the specified range
          */
         private int findRandomPort(int minPort, int maxPort) {
-            int portRange = maxPort - minPort;
+            var portRange = maxPort - minPort;
             return minPort + random.nextInt(portRange + 1);
         }
 
@@ -247,9 +247,9 @@ public class SocketUtils {
          * @throws IllegalStateException if no available port could be found
          */
         int findAvailablePort(int minPort, int maxPort) {
-            int portRange = maxPort - minPort;
+            var portRange = maxPort - minPort;
             int candidatePort;
-            int searchCounter = 0;
+            var searchCounter = 0;
             do {
                 if (searchCounter > portRange) {
                     throw new IllegalStateException(
@@ -275,7 +275,7 @@ public class SocketUtils {
          */
         SortedSet<Integer> findAvailablePorts(int numRequested, int minPort, int maxPort) {
             SortedSet<Integer> availablePorts = new TreeSet<>();
-            int attemptCount = 0;
+            var attemptCount = 0;
             while ((++attemptCount <= numRequested + 100) && availablePorts.size() < numRequested) {
                 availablePorts.add(findAvailablePort(minPort, maxPort));
             }

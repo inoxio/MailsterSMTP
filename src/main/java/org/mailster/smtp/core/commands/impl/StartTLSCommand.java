@@ -23,7 +23,7 @@ public class StartTLSCommand extends AbstractCommand {
 
     static {
         try {
-            DummySSLSocketFactory socketFactory = new DummySSLSocketFactory();
+            var socketFactory = new DummySSLSocketFactory();
             sslFilter = new SslFilter(socketFactory.getSSLContext());
         } catch (Exception e) {
             e.printStackTrace();

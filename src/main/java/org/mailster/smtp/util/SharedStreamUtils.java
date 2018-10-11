@@ -32,7 +32,7 @@ public class SharedStreamUtils {
      * @see org.mailster.smtp.util.DotUnstuffingInputStream
      */
     public static InputStream getPrivateInputStream(boolean useCopy, InputStream data) {
-        InputStream in = data;
+        var in = data;
 
         if (useCopy) {
             if (data instanceof SharedByteArrayInputStream) {

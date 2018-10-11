@@ -101,7 +101,7 @@ public class StopWordSafeInputStream extends FilterInputStream {
      */
     public int read(byte[] arg0, int arg1, int arg2) throws IOException {
         int next;
-        for (int i = 0; i < arg2; i++) {
+        for (var i = 0; i < arg2; i++) {
             next = read();
             if (next == -1) {
                 if (i == 0) {

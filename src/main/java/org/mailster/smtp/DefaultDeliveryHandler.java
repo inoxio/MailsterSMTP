@@ -43,9 +43,9 @@ public class DefaultDeliveryHandler extends AbstractDeliveryHandler {
 
     @Override
     public void recipient(String recipient) throws RejectException {
-        boolean addedListener = false;
+        var addedListener = false;
 
-        for (MessageListener listener : getListeners()) {
+        for (var listener : getListeners()) {
             if (listener.accept(getSessionContext(), this.from, recipient)) {
                 this.deliveries.add(new Delivery(listener, recipient));
                 addedListener = true;
@@ -71,15 +71,15 @@ public class DefaultDeliveryHandler extends AbstractDeliveryHandler {
      */
     @Override
     public void data(InputStream data) throws TooMuchDataException, IOException {
-        boolean useCopy = false;
+        var useCopy = false;
 
         if (LOG.isTraceEnabled()) {
-            Charset charset = getDeliveryContext().getSMTPServerConfig().getCharset();
-            InputStream in = SharedStreamUtils.getPrivateInputStream(useCopy, data);
-            byte[] buf = new byte[16384];
+            var charset = getDeliveryContext().getSMTPServerConfig().getCharset();
+            var in = SharedStreamUtils.getPrivateInputStream(useCopy, data);
+            var buf = new byte[16384];
 
             try {
-                CharsetDecoder decoder = charset.newDecoder();
+                var decoder = charset.newDecoder();
                 int len;
                 while ((len = in.read(buf)) >= 0) {
                     LOG.trace(decoder.decode(ByteBuffer.wrap(buf, 0, len)).toString());
@@ -93,7 +93,7 @@ public class DefaultDeliveryHandler extends AbstractDeliveryHandler {
         // Prevent concurrent modifications
         List<Delivery> list = new ArrayList<>(this.deliveries);
 
-        for (Delivery delivery : list) {
+        for (var delivery : list) {
             delivery.getListener()
                     .deliver(getSessionContext(), this.from, delivery.getRecipient(),
                              SharedStreamUtils.getPrivateInputStream(useCopy, data));

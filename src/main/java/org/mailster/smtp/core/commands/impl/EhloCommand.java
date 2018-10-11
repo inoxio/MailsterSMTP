@@ -32,7 +32,7 @@ public class EhloCommand extends AbstractCommand {
 
     @Override
     public void execute(String commandString, IoSession ioSession, SMTPContext ctx) throws IOException {
-        String[] args = getArgs(commandString);
+        var args = getArgs(commandString);
         if (args.length < 2) {
             sendResponse(ioSession, "501 Syntax: EHLO hostname");
             return;
@@ -45,10 +45,10 @@ public class EhloCommand extends AbstractCommand {
         //		250-ETRN
         //		250 8BITMIME
 
-        SMTPState smtpState = ctx.getSMTPState();
-        StringBuilder response = new StringBuilder();
+        var smtpState = ctx.getSMTPState();
+        var response = new StringBuilder();
         if (!smtpState.getHasSeenHelo()) {
-            SMTPServerConfig cfg = ctx.getSMTPServerConfig();
+            var cfg = ctx.getSMTPServerConfig();
 
             smtpState.setHasSeenHelo(true);
             response.append("250-");
@@ -66,7 +66,7 @@ public class EhloCommand extends AbstractCommand {
 
             response.append("250 Ok");
         } else {
-            String remoteHost = args[1];
+            var remoteHost = args[1];
             response.append("503 ");
             response.append(remoteHost);
             response.append(" Duplicate EHLO");

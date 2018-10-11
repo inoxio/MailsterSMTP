@@ -94,7 +94,7 @@ public class SMTPDecoder implements ProtocolDecoder {
     }
 
     private SMTPDecoderContext getContext(IoSession session) {
-        SMTPDecoderContext ctx = (SMTPDecoderContext) session.getAttribute(CONTEXT);
+        var ctx = (SMTPDecoderContext) session.getAttribute(CONTEXT);
         if (ctx == null) {
             ctx = new SMTPDecoderContext(this);
             session.setAttribute(CONTEXT, ctx);
@@ -108,7 +108,7 @@ public class SMTPDecoder implements ProtocolDecoder {
 
     @Override
     public void dispose(IoSession session) throws Exception {
-        SMTPDecoderContext ctx = (SMTPDecoderContext) session.getAttribute(CONTEXT);
+        var ctx = (SMTPDecoderContext) session.getAttribute(CONTEXT);
         if (ctx != null) {
             ctx.getBuffer().free();
             ctx.closeOutputStream();
@@ -118,30 +118,30 @@ public class SMTPDecoder implements ProtocolDecoder {
 
     @Override
     public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
-        SMTPDecoderContext ctx = getContext(session);
-        int matchCount = ctx.getMatchCount();
+        var ctx = getContext(session);
+        var matchCount = ctx.getMatchCount();
 
-        SMTPContext minaCtx = (SMTPContext) session.getAttribute(SMTPConnectionHandler.CONTEXT_ATTRIBUTE);
+        var minaCtx = (SMTPContext) session.getAttribute(SMTPConnectionHandler.CONTEXT_ATTRIBUTE);
 
-        boolean dataMode = minaCtx.getSMTPState().isDataMode();
+        var dataMode = minaCtx.getSMTPState().isDataMode();
         ctx.setDataMode(dataMode);
-        byte[] delimBuf = dataMode ? SMTP_DATA_DELIMITER : SMTP_CMD_DELIMITER;
+        var delimBuf = dataMode ? SMTP_DATA_DELIMITER : SMTP_CMD_DELIMITER;
 
         // Try to find a match
-        int oldPos = in.position();
-        int oldLimit = in.limit();
+        var oldPos = in.position();
+        var oldLimit = in.limit();
 
         if (matchCount == delimBuf.length) {
             matchCount = 0;
         }
 
         while (in.remaining() > 0) {
-            byte b = in.get();
+            var b = in.get();
             if (delimBuf[matchCount] == b) {
                 matchCount++;
                 if (matchCount == delimBuf.length) {
                     // Found a match.
-                    int pos = in.position();
+                    var pos = in.position();
                     in.limit(pos);
                     in.position(oldPos);
 
@@ -151,7 +151,7 @@ public class SMTPDecoder implements ProtocolDecoder {
                     in.position(pos);
 
                     if (ctx.getOverflowPosition() == 0) {
-                        IoBuffer buf = ctx.getBuffer();
+                        var buf = ctx.getBuffer();
                         buf.flip();
 
                         try {
@@ -169,7 +169,7 @@ public class SMTPDecoder implements ProtocolDecoder {
                             buf.clear();
                         }
                     } else {
-                        String msg = "Line is too long: " + ctx.getOverflowPosition();
+                        var msg = "Line is too long: " + ctx.getOverflowPosition();
                         ctx.reset();
                         throw new BufferDataException(msg);
                     }

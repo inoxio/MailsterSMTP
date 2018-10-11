@@ -205,7 +205,7 @@ public class SharedTmpFileInputStream extends BufferedInputStream implements Sha
             bufpos += count;
         } else if (pos >= buf.length) /* no room left in buffer */ {
             if (markpos > 0) { /* can throw away early part of the buffer */
-                int sz = pos - markpos;
+                var sz = pos - markpos;
                 System.arraycopy(buf, markpos, buf, 0, sz);
                 pos = sz;
                 bufpos += markpos;
@@ -215,7 +215,7 @@ public class SharedTmpFileInputStream extends BufferedInputStream implements Sha
                 pos = 0; /* drop buffer contents */
                 bufpos += count;
             } else { /* grow buffer */
-                int nsz = pos * 2;
+                var nsz = pos * 2;
                 if (nsz > marklimit) {
                     nsz = marklimit;
                 }
@@ -227,11 +227,11 @@ public class SharedTmpFileInputStream extends BufferedInputStream implements Sha
         count = pos;
         in.seek(bufpos + pos);
         // limit to datalen
-        int len = buf.length - pos;
+        var len = buf.length - pos;
         if (bufpos - start + pos + len > datalen) {
             len = (int) (datalen - (bufpos - start + pos));
         }
-        int n = in.read(buf, pos, len);
+        var n = in.read(buf, pos, len);
         if (n > 0) {
             count = n + pos;
         }
@@ -262,7 +262,7 @@ public class SharedTmpFileInputStream extends BufferedInputStream implements Sha
      * stream at most once if necessary.
      */
     private int read1(byte[] b, int off, int len) throws IOException {
-        int avail = count - pos;
+        var avail = count - pos;
         if (avail <= 0) {
             //            if (false) {
             //                /* If the requested length is at least as large as the buffer, and
@@ -280,7 +280,7 @@ public class SharedTmpFileInputStream extends BufferedInputStream implements Sha
                 return -1;
             }
         }
-        int cnt = (avail < len) ? avail : len;
+        var cnt = (avail < len) ? avail : len;
         System.arraycopy(buf, pos, b, off, cnt);
         pos += cnt;
         return cnt;
@@ -310,12 +310,12 @@ public class SharedTmpFileInputStream extends BufferedInputStream implements Sha
             return 0;
         }
 
-        int n = read1(b, off, len);
+        var n = read1(b, off, len);
         if (n <= 0) {
             return n;
         }
         while ((n < len) /* && (in.available() > 0) */) {
-            int n1 = read1(b, off + n, len - n);
+            var n1 = read1(b, off + n, len - n);
             if (n1 <= 0) {
                 break;
             }
@@ -355,7 +355,7 @@ public class SharedTmpFileInputStream extends BufferedInputStream implements Sha
             }
         }
 
-        long skipped = (avail < n) ? avail : n;
+        var skipped = (avail < n) ? avail : n;
         pos += skipped;
         return skipped;
     }

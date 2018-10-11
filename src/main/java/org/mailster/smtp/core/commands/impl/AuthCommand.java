@@ -33,17 +33,17 @@ public class AuthCommand extends AbstractCommand {
 
     @Override
     public void execute(String commandString, IoSession ioSession, SMTPContext ctx) throws IOException {
-        SMTPState smtpState = ctx.getSMTPState();
+        var smtpState = ctx.getSMTPState();
 
         if (smtpState.isAuthenticated()) {
             sendResponse(ioSession, "503 Refusing any other AUTH command");
             return;
         }
 
-        boolean authenticating = smtpState.isAuthenticating();
+        var authenticating = smtpState.isAuthenticating();
 
         if (!authenticating) {
-            String[] args = getArgs(commandString);
+            var args = getArgs(commandString);
 
             // Let's check the command syntax
             if (args.length < 2) {
@@ -52,7 +52,7 @@ public class AuthCommand extends AbstractCommand {
             }
 
             // Let's check if we support the required authentication mechanism
-            String mechanism = args[1];
+            var mechanism = args[1];
             if (!ctx.getAuthenticationHandler().getAuthenticationMechanisms().contains(mechanism.toUpperCase())) {
                 sendResponse(ioSession, "504 Unrecognized authentication type");
                 return;
@@ -69,8 +69,8 @@ public class AuthCommand extends AbstractCommand {
                 return;
             }
 
-            StringBuilder response = new StringBuilder();
-            boolean finished = ctx.getAuthenticationHandler().auth(commandString, response, ctx);
+            var response = new StringBuilder();
+            var finished = ctx.getAuthenticationHandler().auth(commandString, response, ctx);
 
             smtpState.setAuthenticating(!finished);
 

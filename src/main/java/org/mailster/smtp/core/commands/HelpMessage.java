@@ -40,8 +40,8 @@ public class HelpMessage {
     }
 
     private void buildOutputString() {
-        StringBuilder sb = new StringBuilder();
-        StringTokenizer tk = new StringTokenizer(helpMessage, "\n");
+        var sb = new StringBuilder();
+        var tk = new StringTokenizer(helpMessage, "\n");
 
         while (tk.hasMoreTokens()) {
             sb.append("214-");
@@ -74,7 +74,7 @@ public class HelpMessage {
             return false;
         }
 
-        final HelpMessage that = (HelpMessage) o;
+        final var that = (HelpMessage) o;
         if (argumentsDescription != null ? !argumentsDescription.equals(
                 that.argumentsDescription) : that.argumentsDescription != null) {
             return false;

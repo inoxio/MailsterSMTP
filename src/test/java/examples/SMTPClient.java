@@ -46,7 +46,7 @@ public class SMTPClient {
         connector.setHandler(new SMTPSessionHandler("localhost"));
         while (true) {
             try {
-                for (int i = 0; i < 10; i++) {
+                for (var i = 0; i < 10; i++) {
                     connector.connect(new InetSocketAddress(HOSTNAME, PORT));
                 }
                 Thread.sleep(100);

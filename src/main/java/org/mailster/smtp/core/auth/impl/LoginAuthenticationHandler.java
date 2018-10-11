@@ -50,8 +50,8 @@ public class LoginAuthenticationHandler implements AuthenticationHandler {
      */
     @Override
     public boolean auth(String clientInput, StringBuilder response, SMTPContext ctx) throws LoginFailedException {
-        StringTokenizer stk = new StringTokenizer(clientInput);
-        String token = stk.nextToken();
+        var stk = new StringTokenizer(clientInput);
+        var token = stk.nextToken();
         if (token.trim().equalsIgnoreCase("AUTH")) {
             // The RFC2554 "initial-response" parameter must not be present
             // The line must be in the form of "AUTH LOGIN"
@@ -72,7 +72,7 @@ public class LoginAuthenticationHandler implements AuthenticationHandler {
         }
 
         if (username == null) {
-            byte[] decoded = Base64.decode(clientInput);
+            var decoded = Base64.decode(clientInput);
             if (decoded == null) {
                 throw new LoginFailedException();
             }
@@ -81,7 +81,7 @@ public class LoginAuthenticationHandler implements AuthenticationHandler {
             return false;
         }
 
-        byte[] decoded = Base64.decode(clientInput);
+        var decoded = Base64.decode(clientInput);
         if (decoded == null) {
             throw new LoginFailedException();
         }

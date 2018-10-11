@@ -40,8 +40,8 @@ public class PlainAuthenticationHandler implements AuthenticationHandler {
 
     @Override
     public boolean auth(String clientInput, StringBuilder response, SMTPContext ctx) throws LoginFailedException {
-        StringTokenizer stk = new StringTokenizer(clientInput);
-        String secret = stk.nextToken();
+        var stk = new StringTokenizer(clientInput);
+        var secret = stk.nextToken();
         if (secret.trim().equalsIgnoreCase("AUTH")) {
             // Let's read the RFC2554 "initial-response" parameter
             // The line could be in the form of "AUTH PLAIN <base64Secret>"
@@ -60,20 +60,20 @@ public class PlainAuthenticationHandler implements AuthenticationHandler {
             }
         }
 
-        byte[] decodedSecret = Base64.decode(secret);
+        var decodedSecret = Base64.decode(secret);
         if (decodedSecret == null) {
             throw new LoginFailedException();
         }
 
-        int usernameStop = -1;
-        for (int i = 1; i < decodedSecret.length && usernameStop < 0; i++) {
+        var usernameStop = -1;
+        for (var i = 1; i < decodedSecret.length && usernameStop < 0; i++) {
             if (decodedSecret[i] == 0) {
                 usernameStop = i;
             }
         }
 
-        String username = new String(decodedSecret, 1, usernameStop - 1);
-        String password = new String(decodedSecret, usernameStop + 1, decodedSecret.length - usernameStop - 1);
+        var username = new String(decodedSecret, 1, usernameStop - 1);
+        var password = new String(decodedSecret, usernameStop + 1, decodedSecret.length - usernameStop - 1);
         try {
             helper.login(username, password);
             resetState();

@@ -73,7 +73,7 @@ public class CharTerminatedInputStream extends InputStream {
         }
         match = new int[terminator.length];
         buffer = new int[terminator.length];
-        for (int i = 0; i < terminator.length; i++) {
+        for (var i = 0; i < terminator.length; i++) {
             match[i] = (int) terminator[i];
         }
         this.in = in;
@@ -94,7 +94,7 @@ public class CharTerminatedInputStream extends InputStream {
         }
         if (pos == 0) {
             //We have no data... read in a record
-            int b = in.read();
+            var b = in.read();
             if (b == -1) {
                 //End of stream reached without seeing the terminator
                 throw new ProtocolException("pre-mature end of data");
@@ -120,9 +120,9 @@ public class CharTerminatedInputStream extends InputStream {
 
         //The first character is a match... scan for complete match,
         // reading extra chars as needed, until complete match is found
-        for (int i = 0; i < match.length; i++) {
+        for (var i = 0; i < match.length; i++) {
             if (i >= pos) {
-                int b = in.read();
+                var b = in.read();
                 if (b == -1) {
                     //end of stream found, so match cannot be fulfilled.
                     // note we don't set endFound, because otherwise
@@ -149,7 +149,7 @@ public class CharTerminatedInputStream extends InputStream {
      * @return the byte that was previously at the front of the internal buffer
      */
     private int topChar() {
-        int b = buffer[0];
+        var b = buffer[0];
         if (pos > 1) {
             //copy down the buffer to keep the fresh data at top
             System.arraycopy(buffer, 1, buffer, 0, pos - 1);

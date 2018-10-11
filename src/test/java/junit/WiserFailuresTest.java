@@ -104,8 +104,8 @@ public class WiserFailuresTest extends TestCase {
         sendQuit();
 
         assertEquals(1, wiser.getMessages().size());
-        Iterator<WiserMessage> emailIter = wiser.getMessages().iterator();
-        WiserMessage email = emailIter.next();
+        var emailIter = wiser.getMessages().iterator();
+        var email = emailIter.next();
         assertEquals("Body", email.getMimeMessage().getContent().toString());
     }
 
@@ -125,36 +125,36 @@ public class WiserFailuresTest extends TestCase {
         sendQuit();
 
         assertEquals(1, wiser.getMessages().size());
-        Iterator<WiserMessage> emailIter = wiser.getMessages().iterator();
-        WiserMessage email = emailIter.next();
+        var emailIter = wiser.getMessages().iterator();
+        var email = emailIter.next();
         assertEquals("Body", email.getMimeMessage().getContent().toString());
     }
 
     public void testSendEncodedMessage() throws IOException, MessagingException {
-        String body = "\u3042\u3044\u3046\u3048\u304a"; // some Japanese letters
-        String charset = "iso-2022-jp";
+        var body = "\u3042\u3044\u3046\u3048\u304a"; // some Japanese letters
+        var charset = "iso-2022-jp";
 
         // when
         sendMessage("EncodedMessage", body, charset);
 
         // then
         assertEquals(1, wiser.getMessages().size());
-        Iterator<WiserMessage> emailIter = wiser.getMessages().iterator();
-        WiserMessage email = emailIter.next();
+        var emailIter = wiser.getMessages().iterator();
+        var email = emailIter.next();
         assertEquals(body, email.getMimeMessage().getContent().toString());
     }
 
     public void testSendMessageWithCarriageReturn() throws IOException, MessagingException {
-        String bodyWithCR = "\r\n\r\nKeep these\r\npesky\r\n\r\ncarriage returns\r\n";
+        var bodyWithCR = "\r\n\r\nKeep these\r\npesky\r\n\r\ncarriage returns\r\n";
 
         // when
         sendMessage("CRTest", bodyWithCR, null);
 
         // then
         assertEquals(1, wiser.getMessages().size());
-        Iterator<WiserMessage> emailIter = wiser.getMessages().iterator();
-        WiserMessage email = emailIter.next();
-        String received = email.getMimeMessage().getContent().toString();
+        var emailIter = wiser.getMessages().iterator();
+        var email = emailIter.next();
+        var received = email.getMimeMessage().getContent().toString();
 
         // last \r\n will be treated as part of the data termination by javamail
         // Transport ... so we compare the body without the last 2 chars
@@ -163,9 +163,9 @@ public class WiserFailuresTest extends TestCase {
 
     public void testListenersAndContextAttributes() throws MessagingException {
 
-        MimeMessage[] mimeMessages = new MimeMessage[2];
-        Properties mailProps = getMailProperties(wiser.getPort());
-        Session session = Session.getInstance(mailProps, null);
+        var mimeMessages = new MimeMessage[2];
+        var mailProps = getMailProperties(wiser.getPort());
+        var session = Session.getInstance(mailProps, null);
         session.setDebug(true);
 
         mimeMessages[0] = createMessage(session, "Doodle1", "Bug1", null);
@@ -179,7 +179,7 @@ public class WiserFailuresTest extends TestCase {
             }
         });
 
-        Transport transport = session.getTransport("smtp");
+        var transport = session.getTransport("smtp");
         transport.connect("localhost", wiser.getPort(), null, null);
         transport.sendMessage(mimeMessages[0], mimeMessages[0].getAllRecipients());
         transport.close();
@@ -209,18 +209,18 @@ public class WiserFailuresTest extends TestCase {
 
     public void testSendTwoMessagesSameConnection() throws MessagingException {
 
-        MimeMessage[] mimeMessages = new MimeMessage[2];
-        Properties mailProps = getMailProperties(wiser.getPort());
-        Session session = Session.getInstance(mailProps, null);
+        var mimeMessages = new MimeMessage[2];
+        var mailProps = getMailProperties(wiser.getPort());
+        var session = Session.getInstance(mailProps, null);
         session.setDebug(true);
 
         mimeMessages[0] = createMessage(session, "Doodle1", "Bug1", null);
         mimeMessages[1] = createMessage(session, "Doodle2", "Bug2", null);
 
-        try (Transport transport = session.getTransport("smtp")) {
+        try (var transport = session.getTransport("smtp")) {
             transport.connect("localhost", wiser.getPort(), null, null);
 
-            for (MimeMessage mimeMessage : mimeMessages) {
+            for (var mimeMessage : mimeMessages) {
                 transport.sendMessage(mimeMessage, mimeMessage.getAllRecipients());
             }
         }
@@ -229,12 +229,12 @@ public class WiserFailuresTest extends TestCase {
 
     public void testSendTwoMsgsWithLogin() throws MessagingException, IOException {
 
-        String From = "sender@here.com";
-        String To = "receiver@there.com";
-        String Subject = "Test";
-        String body = "Test Body";
+        var From = "sender@here.com";
+        var To = "receiver@there.com";
+        var Subject = "Test";
+        var body = "Test Body";
 
-        Session session = Session.getInstance(getMailProperties(wiser.getPort()), null);
+        var session = Session.getInstance(getMailProperties(wiser.getPort()), null);
         Message msg = new MimeMessage(session);
         msg.setFrom(new InternetAddress(From));
         msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(To, false));
@@ -244,7 +244,7 @@ public class WiserFailuresTest extends TestCase {
         msg.setHeader("X-Mailer", "here");
         msg.setSentDate(new Date());
 
-        try (Transport transport = session.getTransport("smtp")) {
+        try (var transport = session.getTransport("smtp")) {
             transport.connect(HOST_NAME, wiser.getPort(), "ddd", "ddd");
             assertEquals(0, wiser.getMessages().size());
             transport.sendMessage(msg, InternetAddress.parse(To, false));
@@ -253,15 +253,15 @@ public class WiserFailuresTest extends TestCase {
             assertEquals(2, wiser.getMessages().size());
         }
 
-        Iterator<WiserMessage> emailIter = wiser.getMessages().iterator();
-        WiserMessage email = emailIter.next();
-        MimeMessage mime = email.getMimeMessage();
+        var emailIter = wiser.getMessages().iterator();
+        var email = emailIter.next();
+        var mime = email.getMimeMessage();
         assertEquals("Test", mime.getHeader("Subject")[0]);
         assertEquals("Test Body", mime.getContent().toString());
     }
 
     private Properties getMailProperties(int port) {
-        Properties mailProps = new Properties();
+        var mailProps = new Properties();
         mailProps.setProperty("mail.smtp.host", "localhost");
         mailProps.setProperty("mail.smtp.port", "" + port);
         mailProps.setProperty("mail.smtp.sendpartial", "true");
@@ -270,16 +270,16 @@ public class WiserFailuresTest extends TestCase {
 
     private void sendMessage(String subject, String body, String charset) throws MessagingException {
 
-        Properties mailProps = getMailProperties(wiser.getPort());
-        Session session = Session.getInstance(mailProps, null);
+        var mailProps = getMailProperties(wiser.getPort());
+        var session = Session.getInstance(mailProps, null);
 
-        MimeMessage msg = createMessage(session, subject, body, charset);
+        var msg = createMessage(session, subject, body, charset);
         Transport.send(msg);
     }
 
     private MimeMessage createMessage(Session session, String subject, String body, String charset) throws MessagingException {
 
-        MimeMessage msg = new MimeMessage(session);
+        var msg = new MimeMessage(session);
         msg.setFrom(new InternetAddress("sender@whatever.com"));
         msg.setSubject(subject);
         msg.setSentDate(new Date());
@@ -295,49 +295,49 @@ public class WiserFailuresTest extends TestCase {
     }
 
     private void assertConnect() throws IOException {
-        String response = readInput();
+        var response = readInput();
         assertTrue(response, response.startsWith("220"));
     }
 
     private void sendDataEnd() throws IOException {
         send(".");
-        String response = readInput();
+        var response = readInput();
         assertTrue(response, response.startsWith("250"));
     }
 
     private void sendDataStart() throws IOException {
         send("DATA");
-        String response = readInput();
+        var response = readInput();
         assertTrue(response, response.startsWith("354"));
     }
 
     private void sendExtendedHello() throws IOException {
         send("EHLO " + WiserFailuresTest.HOST_NAME);
-        String response = readInput();
+        var response = readInput();
         assertTrue(response, response.startsWith("250"));
     }
 
     private void sendMailFrom() throws IOException {
         send("MAIL FROM:<" + WiserFailuresTest.FROM_ADDRESS + ">");
-        String response = readInput();
+        var response = readInput();
         assertTrue(response, response.startsWith("250"));
     }
 
     private void sendQuit() throws IOException {
         send("QUIT");
-        String response = readInput();
+        var response = readInput();
         assertTrue(response, response.startsWith("221"));
     }
 
     private void sendReceiptTo() throws IOException {
         send("RCPT TO:<" + WiserFailuresTest.TO_ADDRESS + ">");
-        String response = readInput();
+        var response = readInput();
         assertTrue(response, response.startsWith("250"));
     }
 
     private void sendReset() throws IOException {
         send("RSET");
-        String response = readInput();
+        var response = readInput();
         assertTrue(response, response.startsWith("250"));
     }
 
@@ -348,7 +348,7 @@ public class WiserFailuresTest extends TestCase {
     }
 
     private String readInput() throws IOException {
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
         do {
             sb.append(input.readLine()).append("\n");
         } while (input.ready());
