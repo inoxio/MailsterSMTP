@@ -23,7 +23,7 @@ compile("de.inoxio:mailster-smtp:1.0.0")
 
 # Start a server
 
-```java
+```jshelllanguage
 var server = new SMTPServer(new MessageListenerAdapter() {
     @Override
     public void deliver(SessionContext ctx, String from, String recipient, InputStream data) {
@@ -34,7 +34,9 @@ var server = new SMTPServer(new MessageListenerAdapter() {
 ```
 ## Check for new dependencies
 
+```bash
 ./gradlew dependencyUpdates -Drevision=release
+```
 
 ## Release
 
