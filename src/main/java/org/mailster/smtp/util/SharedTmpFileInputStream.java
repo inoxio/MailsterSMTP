@@ -133,7 +133,7 @@ public class SharedTmpFileInputStream extends BufferedInputStream implements Sha
      *
      * @param file the file
      * @param size the buffer size.
-     * @throws IllegalArgumentException if size <= 0.
+     * @throws IllegalArgumentException if size &lt;= 0.
      */
     public SharedTmpFileInputStream(File file, int size) throws IOException {
         super(null); // XXX - will it NPE?
@@ -149,7 +149,7 @@ public class SharedTmpFileInputStream extends BufferedInputStream implements Sha
      *
      * @param file the file
      * @param size the buffer size.
-     * @throws IllegalArgumentException if size <= 0.
+     * @throws IllegalArgumentException if size &lt;= 0.
      */
     public SharedTmpFileInputStream(String file, int size) throws IOException {
         super(null); // XXX - will it NPE?
