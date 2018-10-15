@@ -5,6 +5,7 @@ import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 
 plugins {
     id("java")
+    id("maven-publish")
     id("com.github.ben-manes.versions") version "0.20.0"
     id("com.jfrog.bintray") version "1.8.4"
 }
@@ -23,15 +24,36 @@ repositories {
 
 dependencies {
     // logging
-    compile("org.slf4j:slf4j-api:1.7.25")
+    implementation("org.slf4j:slf4j-api:1.7.25")
     // network
-    compile("org.apache.mina:mina-core:2.0.19")
-    compile("com.sun.mail:javax.mail:1.6.2")
-    compile("commons-validator:commons-validator:1.6")
+    implementation("org.apache.mina:mina-core:2.0.19")
+    implementation("com.sun.mail:javax.mail:1.6.2")
+    implementation("commons-validator:commons-validator:1.6")
     // test
-    testCompile("junit:junit:4.12")
+    testImplementation("junit:junit:4.12")
     // logging
-    testRuntime("org.apache.logging.log4j:log4j-slf4j-impl:2.11.1")
+    testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.11.1")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("publication") {
+            groupId = project.group as String
+            artifactId = project.name
+            version = project.version as String
+
+            from(components["java"])
+            artifact(task<Jar>("sourceJar") {
+                classifier = "sources"
+                from(sourceSets["main"].allSource)
+            })
+            artifact(task<Jar>("javadocJar") {
+                dependsOn + "javadoc"
+                classifier = "javadoc"
+                from(tasks.withType<Javadoc>().first().destinationDir)
+            })
+        }
+    }
 }
 
 bintray {
@@ -40,11 +62,11 @@ bintray {
     key = properties["bintrayApiKey"] as String?
             ?: System.getenv("BINTRAY_API_KEY")
 
-    setConfigurations("archives")
+    setPublications("publication")
 
     publish = true
 
-    pkg(closureOf<BintrayExtension.PackageConfig> {
+    pkg.apply {
         repo = "maven"
         userOrg = "inoxio"
         name = project.name
@@ -54,14 +76,14 @@ bintray {
         vcsUrl = "https://github.com/inoxio/MailsterSMTP.git"
         githubRepo = "inoxio/MailsterSMTP"
 
-        version(closureOf<BintrayExtension.VersionConfig> {
+        version.apply {
             name = project.version as String
             vcsTag = project.version as String
-            gpg(closureOf<BintrayExtension.GpgConfig> {
+            gpg.apply {
                 sign = true
-            })
-        })
-    })
+            }
+        }
+    }
 }
 
 tasks {
@@ -90,5 +112,8 @@ tasks {
     withType<Wrapper> {
         distributionType = ALL
         gradleVersion = "4.10.2"
+    }
+    tasks.withType<Javadoc> {
+        (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
     }
 }
