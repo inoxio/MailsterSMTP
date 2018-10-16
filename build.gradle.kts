@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "de.inoxio"
-version = "1.0.1"
+version = "1.0.2"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_10
@@ -35,45 +35,75 @@ dependencies {
     testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.11.1")
 }
 
+val sourcesJar by tasks.registering(Jar::class) {
+    dependsOn + "classes"
+    classifier = "sources"
+    from(sourceSets["main"].allSource)
+}
+
+val javadocJar by tasks.registering(Jar::class) {
+    dependsOn + "javadoc"
+    classifier = "javadoc"
+    from(tasks.withType<Javadoc>().first().destinationDir)
+}
+
 publishing {
     publications {
-        create<MavenPublication>("publication") {
+        register("publication", MavenPublication::class) {
             groupId = project.group as String
             artifactId = project.name
             version = project.version as String
 
             from(components["java"])
-            artifact(task<Jar>("sourceJar") {
-                classifier = "sources"
-                from(sourceSets["main"].allSource)
-            })
-            artifact(task<Jar>("javadocJar") {
-                dependsOn + "javadoc"
-                classifier = "javadoc"
-                from(tasks.withType<Javadoc>().first().destinationDir)
-            })
+            artifact(sourcesJar.get())
+            artifact(javadocJar.get())
+
+            pom.withXml {
+                asNode().apply {
+                    appendNode("description", "A NIO SMTP server API written in Java")
+                    appendNode("name", "$groupId:$artifactId")
+                    appendNode("url", "https://github.com/inoxio/MailsterSMTP")
+
+                    val license = appendNode("licenses").appendNode("license")
+                    license.appendNode("name", "The Apache Software License, Version 2.0")
+                    license.appendNode("url", "http://www.apache.org/licenses/LICENSE-2.0.txt")
+
+                    val developer = appendNode("developers").appendNode("developer")
+                    developer.appendNode("name", "Michael Kunze")
+                    developer.appendNode("email", "mkunze@inoxio.de")
+                    developer.appendNode("organization", "inoxio Quality Services GmbH")
+                    developer.appendNode("organizationUrl", "https://www.inoxio.de")
+
+                    val scm = appendNode("scm")
+                    scm.appendNode("connection", "scm:git:git://github.com/inoxio/MailsterSMTP.git")
+                    scm.appendNode("developerConnection", "scm:git:ssh://github.com:inoxio/MailsterSMTP.git")
+                    scm.appendNode("url", "http://github.com/inoxio/MailsterSMTP/tree/master")
+                }
+            }
         }
     }
 }
 
 bintray {
-    user = properties["bintrayUser"] as String?
+    user = properties["bintray.user"] as String?
             ?: System.getenv("BINTRAY_USER")
-    key = properties["bintrayApiKey"] as String?
+    key = properties["bintray.api-key"] as String?
             ?: System.getenv("BINTRAY_API_KEY")
 
     setPublications("publication")
 
     publish = true
+    override = false
 
     pkg.apply {
         repo = "maven"
-        userOrg = "inoxio"
         name = project.name
-
-        setLicenses("Apache-2.0")
+        userOrg = "inoxio"
+        desc = "A NIO SMTP server API written in Java"
+        websiteUrl = "https://github.com/inoxio/MailsterSMTP"
         issueTrackerUrl = "https://github.com/inoxio/MailsterSMTP/issues"
         vcsUrl = "https://github.com/inoxio/MailsterSMTP.git"
+        setLicenses("Apache-2.0")
         githubRepo = "inoxio/MailsterSMTP"
 
         version.apply {
@@ -81,6 +111,14 @@ bintray {
             vcsTag = project.version as String
             gpg.apply {
                 sign = true
+            }
+            mavenCentralSync.apply {
+                sync = true
+                user = properties["oss.user"] as String?
+                        ?: System.getenv("OSS_USER")
+                password = properties["oss.password"] as String?
+                        ?: System.getenv("OSS_PASSWORD")
+                close = "1"
             }
         }
     }

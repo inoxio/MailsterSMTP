@@ -11,14 +11,14 @@ This is a fork from the original (https://github.com/edeoliveira/MailsterSMTP)
 
 ```kotlin
 repositories {
-    maven("https://dl.bintray.com/inoxio/maven")
+    mavenCentral()
 } 
 ```
 
 ## Dependency
 
 ```kotlin
-compile("de.inoxio:mailster-smtp:1.0.0")
+compile("de.inoxio:mailster-smtp:1.0.2")
 ```
 
 # Start a server
@@ -40,7 +40,7 @@ var server = new SMTPServer(new MessageListenerAdapter() {
 
 ## Release
 
-Change version in `build.gradle.kts` and SMTPServerConfig
+Change version in `build.gradle.kts`, `README.md` and `SMTPServerConfig.java` and issue:
 
 ```bash
 ./gradlew bintrayUpload
