@@ -4,7 +4,7 @@ import com.jfrog.bintray.gradle.tasks.RecordingCopyTask
 import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 
 plugins {
-    id("java")
+    id("java-library")
     id("maven-publish")
     id("com.github.ben-manes.versions") version "0.20.0"
     id("com.jfrog.bintray") version "1.8.4"
@@ -26,7 +26,7 @@ dependencies {
     // logging
     implementation("org.slf4j:slf4j-api:1.7.25")
     // network
-    implementation("org.apache.mina:mina-core:2.0.19")
+    api("org.apache.mina:mina-core:2.0.19")
     implementation("com.sun.mail:javax.mail:1.6.2")
     implementation("commons-validator:commons-validator:1.6")
     // test
