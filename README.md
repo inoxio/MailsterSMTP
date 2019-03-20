@@ -18,7 +18,7 @@ repositories {
 ## Dependency
 
 ```kotlin
-compile("de.inoxio:mailster-smtp:1.0.3")
+compile("de.inoxio:mailster-smtp:1.0.4")
 ```
 
 # Start a server
