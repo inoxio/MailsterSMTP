@@ -6,7 +6,7 @@ import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 plugins {
     id("java-library")
     id("maven-publish")
-    id("com.github.ben-manes.versions") version "0.20.0"
+    id("com.github.ben-manes.versions") version "0.21.0"
     id("com.jfrog.bintray") version "1.8.4"
 }
 
@@ -24,15 +24,15 @@ repositories {
 
 dependencies {
     // logging
-    implementation("org.slf4j:slf4j-api:1.7.25")
+    implementation("org.slf4j:slf4j-api:1.7.26")
     // network
-    api("org.apache.mina:mina-core:2.0.19")
-    implementation("com.sun.mail:javax.mail:1.6.2")
+    api("org.apache.mina:mina-core:2.1.0")
+    implementation("com.sun.mail:jakarta.mail:1.6.3")
     implementation("commons-validator:commons-validator:1.6")
     // test
     testImplementation("junit:junit:4.12")
     // logging
-    testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.11.1")
+    testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.11.2")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
