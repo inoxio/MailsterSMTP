@@ -26,7 +26,7 @@ dependencies {
     // logging
     implementation("org.slf4j:slf4j-api:1.7.26")
     // network
-    api("org.apache.mina:mina-core:2.1.0")
+    api("org.apache.mina:mina-core:2.1.3")
     implementation("com.sun.mail:jakarta.mail:1.6.3")
     implementation("commons-validator:commons-validator:1.6")
     // test
