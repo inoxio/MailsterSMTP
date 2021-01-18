@@ -1,9 +1,9 @@
 package junit;
 
+import org.mailster.smtp.SMTPServer;
+
 import junit.framework.TestCase;
 import junit.util.SocketUtils;
-
-import org.mailster.smtp.SMTPServer;
 
 /**
  * This class attempts to quickly start/stop the server 10 times.

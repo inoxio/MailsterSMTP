@@ -2,8 +2,7 @@ package org.mailster.smtp.util;
 
 import java.io.InputStream;
 
-import javax.mail.util.SharedByteArrayInputStream;
-
+import jakarta.mail.util.SharedByteArrayInputStream;
 
 /**
  * Shared streams utility methods.

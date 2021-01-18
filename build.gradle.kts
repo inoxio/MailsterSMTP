@@ -1,17 +1,15 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import com.jfrog.bintray.gradle.BintrayExtension
-import com.jfrog.bintray.gradle.tasks.RecordingCopyTask
 import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 
 plugins {
     id("java-library")
     id("maven-publish")
-    id("com.github.ben-manes.versions") version "0.21.0"
-    id("com.jfrog.bintray") version "1.8.4"
+    id("com.github.ben-manes.versions") version "0.33.0"
+    id("com.jfrog.bintray") version "1.8.5"
 }
 
 group = "de.inoxio"
-version = "1.0.5"
+version = "1.0.6"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_10
@@ -24,26 +22,26 @@ repositories {
 
 dependencies {
     // logging
-    implementation("org.slf4j:slf4j-api:1.7.26")
+    implementation("org.slf4j:slf4j-api:1.7.30")
     // network
-    api("org.apache.mina:mina-core:2.1.3")
-    implementation("com.sun.mail:jakarta.mail:1.6.3")
-    implementation("commons-validator:commons-validator:1.6")
+    api("org.apache.mina:mina-core:2.1.4")
+    implementation("com.sun.mail:jakarta.mail:2.0.0")
+    implementation("commons-validator:commons-validator:1.7")
     // test
-    testImplementation("junit:junit:4.12")
+    testImplementation("junit:junit:4.13.1")
     // logging
-    testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.11.2")
+    testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.13.3")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
     dependsOn + "classes"
-    classifier = "sources"
+    archiveClassifier.set("sources")
     from(sourceSets["main"].allSource)
 }
 
 val javadocJar by tasks.registering(Jar::class) {
     dependsOn + "javadoc"
-    classifier = "javadoc"
+    archiveClassifier.set("javadoc")
     from(tasks.withType<Javadoc>().first().destinationDir)
 }
 
@@ -134,22 +132,14 @@ tasks {
         }
     }
     withType<DependencyUpdatesTask> {
-        resolutionStrategy {
-            componentSelection {
-                all {
-                    if (listOf("alpha", "beta", "b01", "rc", "cr", "m")
-                                    .asSequence()
-                                    .map { qualifier -> Regex("(?i).*[.-]$qualifier[.\\d-]*") }
-                                    .any { it.matches(candidate.version) }) {
-                        reject("Release candidate")
-                    }
-                }
-            }
+        rejectVersionIf {
+            listOf("alpha", "beta", "rc", "cr", "m", "preview", "b", "ea", "pr")
+                    .any { qualifier -> "(?i).*[.-]$qualifier[.\\d-+]*".toRegex().matches(candidate.version) }
         }
     }
     withType<Wrapper> {
         distributionType = ALL
-        gradleVersion = "5.4.1"
+        gradleVersion = "6.7"
     }
     withType<Javadoc> {
         (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)

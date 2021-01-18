@@ -1,18 +1,16 @@
 package junit;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import junit.util.Client;
-import junit.util.SocketUtils;
-
 import org.junit.Test;
 import org.mailster.smtp.api.handler.SessionContext;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+import junit.util.Client;
+import junit.util.SocketUtils;
 import wiser.Wiser;
 
 /**

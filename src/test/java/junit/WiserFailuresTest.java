@@ -9,20 +9,18 @@ import java.net.Socket;
 import java.util.Date;
 import java.util.Properties;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
-import junit.framework.TestCase;
-import junit.util.SocketUtils;
-
 import org.mailster.smtp.api.MessageListener;
 import org.mailster.smtp.api.MessageListenerAdapter;
 import org.mailster.smtp.api.handler.SessionContext;
 
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
+import junit.framework.TestCase;
+import junit.util.SocketUtils;
 import wiser.Wiser;
 
 /**

@@ -3,10 +3,9 @@ package junit;
 import java.io.File;
 import java.io.FileOutputStream;
 
-import junit.framework.TestCase;
-
 import org.mailster.smtp.util.SharedTmpFileInputStream;
 
+import junit.framework.TestCase;
 import wiser.WiserMessage;
 
 /**

@@ -6,12 +6,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.CharsetDecoder;
 
-import javax.mail.util.SharedByteArrayInputStream;
-
 import org.apache.mina.core.buffer.IoBuffer;
 import org.mailster.smtp.util.SharedTmpFileInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.mail.util.SharedByteArrayInputStream;
 
 /**
  * The SMTP protocol decoder context is used when a client

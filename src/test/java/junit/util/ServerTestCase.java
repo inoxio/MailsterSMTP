@@ -2,10 +2,9 @@ package junit.util;
 
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
 import org.mailster.smtp.api.handler.SessionContext;
 
+import junit.framework.TestCase;
 import wiser.Wiser;
 
 /**
