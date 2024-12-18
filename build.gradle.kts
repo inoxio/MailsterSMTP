@@ -21,7 +21,7 @@ dependencies {
     // network
     api("org.apache.mina:mina-core:2.1.4")
     implementation("com.sun.mail:jakarta.mail:2.0.0")
-    implementation("commons-validator:commons-validator:1.7")
+    implementation("commons-validator:commons-validator:1.9.0")
     // test
     testImplementation("junit:junit:4.13.1")
     // logging
