@@ -22,7 +22,7 @@ dependencies {
     api("org.apache.mina:mina-core:2.1.4")
     implementation("com.sun.mail:jakarta.mail:2.0.0")
     // test
-    testImplementation("junit:junit:4.13.1")
+    testImplementation("junit:junit:4.13.2")
     // logging
     testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.13.3")
 }
