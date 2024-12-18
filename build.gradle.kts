@@ -139,7 +139,7 @@ tasks {
     }
     withType<Wrapper> {
         distributionType = ALL
-        gradleVersion = "6.7"
+        gradleVersion = "6.9.4"
     }
     withType<Javadoc> {
         (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
