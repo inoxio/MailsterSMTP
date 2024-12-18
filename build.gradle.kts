@@ -1,19 +1,14 @@
-import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
-
 plugins {
     id("java-library")
     id("maven-publish")
-    id("com.github.ben-manes.versions") version "0.33.0"
-    id("com.jfrog.bintray") version "1.8.5"
 }
 
 group = "de.inoxio"
-version = "1.0.6"
+version = "1.1.0"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_10
-    targetCompatibility = JavaVersion.VERSION_1_10
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 repositories {
@@ -82,46 +77,6 @@ publishing {
     }
 }
 
-bintray {
-    user = properties["bintray.user"] as String?
-            ?: System.getenv("BINTRAY_USER")
-    key = properties["bintray.api-key"] as String?
-            ?: System.getenv("BINTRAY_API_KEY")
-
-    setPublications("publication")
-
-    publish = true
-    override = false
-
-    pkg.apply {
-        repo = "maven"
-        name = project.name
-        userOrg = "inoxio"
-        desc = "A NIO SMTP server API written in Java"
-        websiteUrl = "https://github.com/inoxio/MailsterSMTP"
-        issueTrackerUrl = "https://github.com/inoxio/MailsterSMTP/issues"
-        vcsUrl = "https://github.com/inoxio/MailsterSMTP.git"
-        setLicenses("Apache-2.0")
-        githubRepo = "inoxio/MailsterSMTP"
-
-        version.apply {
-            name = project.version as String
-            vcsTag = project.version as String
-            gpg.apply {
-                sign = true
-            }
-            mavenCentralSync.apply {
-                sync = true
-                user = properties["oss.user"] as String?
-                        ?: System.getenv("OSS_USER")
-                password = properties["oss.password"] as String?
-                        ?: System.getenv("OSS_PASSWORD")
-                close = "1"
-            }
-        }
-    }
-}
-
 tasks {
     withType<JavaCompile> {
         options.apply {
@@ -130,16 +85,6 @@ tasks {
             encoding = "UTF-8"
             compilerArgs = mutableListOf("-Xlint")
         }
-    }
-    withType<DependencyUpdatesTask> {
-        rejectVersionIf {
-            listOf("alpha", "beta", "rc", "cr", "m", "preview", "b", "ea", "pr")
-                    .any { qualifier -> "(?i).*[.-]$qualifier[.\\d-+]*".toRegex().matches(candidate.version) }
-        }
-    }
-    withType<Wrapper> {
-        distributionType = ALL
-        gradleVersion = "6.7"
     }
     withType<Javadoc> {
         (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
