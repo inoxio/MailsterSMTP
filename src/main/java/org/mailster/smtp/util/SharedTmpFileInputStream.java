@@ -355,8 +355,8 @@ public class SharedTmpFileInputStream extends BufferedInputStream implements Sha
             }
         }
 
-        var skipped = (avail < n) ? avail : n;
-        pos += skipped;
+        final var skipped = Math.min(avail, n);
+        pos += (int) skipped;
         return skipped;
     }
 

@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * NB: some code comes from a fork from the SubethaSMTP project.
  */
-public class SMTPServer {
+public final class SMTPServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(SMTPServer.class);
 
@@ -267,6 +267,7 @@ public class SMTPServer {
      * Sets the port the server will run on.
      */
     public void setPort(int port) {
+        LOG.info("Set port to " + port);
         this.port = port;
     }
 

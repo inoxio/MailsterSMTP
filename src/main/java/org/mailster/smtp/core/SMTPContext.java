@@ -16,7 +16,7 @@ import org.mailster.smtp.core.auth.Credential;
  *
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
-public class SMTPContext implements DeliveryContext {
+public final class SMTPContext implements DeliveryContext {
 
     private SMTPServerConfig cfg;
 

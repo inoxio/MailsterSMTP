@@ -34,7 +34,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
  *
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
-public class SMTPDecoder implements ProtocolDecoder {
+public final class SMTPDecoder implements ProtocolDecoder {
 
     protected final static String TMPFILE_PREFIX = "mailsterSmtp";
     protected final static String TMPFILE_SUFFIX = ".eml";

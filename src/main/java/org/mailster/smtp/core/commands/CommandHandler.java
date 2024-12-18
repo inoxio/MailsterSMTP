@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * @author Jon Stevens
  * @author Edouard De Oliveira &lt;doe_wanted@yahoo.fr&gt;
  */
-public class CommandHandler {
+public final class CommandHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandHandler.class);
     private Map<String, Command> commandMap = new HashMap<>();
@@ -28,7 +28,7 @@ public class CommandHandler {
      * Populates a default set of commands based with the BuiltinCommandRegistry commands.
      */
     public CommandHandler() {
-        for (var entry : BuiltinCommandRegistry.values()) {
+        for (final var entry : BuiltinCommandRegistry.values()) {
             addCommand(entry.getCommand());
         }
     }
