@@ -24,7 +24,7 @@ dependencies {
     // test
     testImplementation("junit:junit:4.13.2")
     // logging
-    testRuntimeOnly("ch.qos.logback:logback-classic:1.4.6")
+    testRuntimeOnly("ch.qos.logback:logback-classic:1.5.12")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
