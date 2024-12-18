@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.mailster.smtp.api.handler.SessionContext;
 
 import junit.framework.TestCase;
+import wiser.InMemoryMessageDelivery;
 import wiser.Wiser;
 
 /**
@@ -28,12 +29,12 @@ public abstract class ServerTestCase extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        this.wiser = new Wiser(SocketUtils.findAvailableTcpPort()) {
+        this.wiser = new Wiser(SocketUtils.findAvailableTcpPort(), new InMemoryMessageDelivery() {
             @Override
             public boolean accept(SessionContext ctx, String from, String recipient) {
                 return !recipient.equals("failure@example.org");
             }
-        };
+        });
         this.wiser.setHostname("localhost");
         this.wiser.start();
 

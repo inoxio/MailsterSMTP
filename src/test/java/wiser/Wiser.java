@@ -1,15 +1,9 @@
 package wiser;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.mailster.smtp.SMTPServer;
-import org.mailster.smtp.api.MessageListener;
-import org.mailster.smtp.api.handler.SessionContext;
 
 /**
  * Wiser is a smart mail testing application.
@@ -17,10 +11,10 @@ import org.mailster.smtp.api.handler.SessionContext;
  * @author Jon Stevens
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
-public class Wiser implements MessageListener {
+public class Wiser {
 
     private final SMTPServer server;
-    private final List<WiserMessage> messages = Collections.synchronizedList(new ArrayList<>());
+    private final InMemoryMessageDelivery inMemoryMessageDelivery;
 
     /**
      * Create a new SMTP server with this class as the listener.
@@ -28,11 +22,14 @@ public class Wiser implements MessageListener {
      * calling start().
      */
     public Wiser(final int port) {
+        this(port, new InMemoryMessageDelivery());
+    }
 
-        Collection<MessageListener> listeners = new ArrayList<>(1);
-        listeners.add(this);
+    public Wiser(final int port, final InMemoryMessageDelivery listener) {
 
-        this.server = new SMTPServer(listeners);
+        this.inMemoryMessageDelivery = listener;
+
+        this.server = new SMTPServer(listener);
         this.server.setPort(port);
 
         // Set max connections much higher since we use NIO now.
@@ -105,42 +102,13 @@ public class Wiser implements MessageListener {
     }
 
     /**
-     * Always accept everything
-     */
-    @Override
-    public boolean accept(SessionContext ctx, String from, String recipient) {
-        return true;
-    }
-
-    /**
-     * Cache the messages in memory. Now avoids unnecessary memory copying.
-     */
-    @Override
-    public void deliver(SessionContext ctx, String from, String recipient, InputStream data) throws IOException {
-        var msg = new WiserMessage(from, recipient, data);
-        this.queueMessage(msg);
-    }
-
-    /**
-     * deliver() calls queueMessage to store the message in an internal
-     * List&lt;WiserMessage&gt. You can extend Wiser and override this method if
-     * you want to store it in a different location instead.
-     */
-    private void queueMessage(WiserMessage message) {
-        this.messages.add(message);
-    }
-
-    /**
-     * @return the list of WiserMessages
-     */
-    public List<WiserMessage> getMessages() {
-        return this.messages;
-    }
-
-    /**
      * @return an instance of the SMTPServer object
      */
     public SMTPServer getServer() {
         return this.server;
+    }
+
+    public List<WiserMessage> getMessages() {
+        return this.inMemoryMessageDelivery.getMessages();
     }
 }

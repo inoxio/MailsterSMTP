@@ -11,6 +11,7 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import junit.util.Client;
 import junit.util.SocketUtils;
+import wiser.InMemoryMessageDelivery;
 import wiser.Wiser;
 
 /**
@@ -23,9 +24,8 @@ public class ResetTest {
 
     @Test
     public void testReset() throws Exception {
-        Wiser wiser = new Wiser(SocketUtils.findAvailableTcpPort()) {
+        Wiser wiser = new Wiser(SocketUtils.findAvailableTcpPort(), new InMemoryMessageDelivery() {
             int receivedMailsCount;
-
             @Override
             public void deliver(SessionContext ctx, String from, String recipient, InputStream data) throws IOException {
                 super.deliver(ctx, from, recipient, data);
@@ -47,7 +47,7 @@ public class ResetTest {
                 }
 
             }
-        };
+        });
         wiser.start();
         wiser.setDataDeferredSize(2 * 1024);
 
