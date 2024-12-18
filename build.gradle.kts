@@ -25,7 +25,7 @@ dependencies {
     // test
     testImplementation("junit:junit:4.13.1")
     // logging
-    testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.13.3")
+    testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.24.3")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
