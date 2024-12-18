@@ -23,7 +23,7 @@ dependencies {
     implementation("com.sun.mail:jakarta.mail:2.0.0")
     implementation("commons-validator:commons-validator:1.7")
     // test
-    testImplementation("junit:junit:4.13.1")
+    testImplementation("junit:junit:4.13.2")
     // logging
     testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.13.3")
 }
