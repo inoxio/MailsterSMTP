@@ -17,14 +17,14 @@ repositories {
 
 dependencies {
     // logging
-    implementation("org.slf4j:slf4j-api:1.7.30")
+    implementation("org.slf4j:slf4j-api:2.0.16")
     // network
     api("org.apache.mina:mina-core:2.1.4")
     implementation("com.sun.mail:jakarta.mail:2.0.0")
     // test
     testImplementation("junit:junit:4.13.2")
     // logging
-    testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.13.3")
+    testRuntimeOnly("ch.qos.logback:logback-classic:1.4.6")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
