@@ -17,7 +17,7 @@ repositories {
 
 dependencies {
     // logging
-    implementation("org.slf4j:slf4j-api:1.7.30")
+    implementation("org.slf4j:slf4j-api:2.0.16")
     // network
     api("org.apache.mina:mina-core:2.1.4")
     implementation("com.sun.mail:jakarta.mail:2.0.0")
