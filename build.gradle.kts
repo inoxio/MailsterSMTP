@@ -4,7 +4,7 @@ import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 plugins {
     id("java-library")
     id("maven-publish")
-    id("com.github.ben-manes.versions") version "0.33.0"
+    id("com.github.ben-manes.versions") version "0.51.0"
     id("com.jfrog.bintray") version "1.8.5"
 }
 
