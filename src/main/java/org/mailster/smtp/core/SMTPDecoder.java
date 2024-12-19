@@ -74,7 +74,7 @@ public final class SMTPDecoder implements ProtocolDecoder {
     /**
      * Returns the allowed maximum size of the line to be decoded. If the size
      * of the line to be decoded exceeds this value, the decoder will throw a
-     * {@link BufferDataException}. The default value is <tt>998</tt> bytes.
+     * {@link BufferDataException}. The default value is <i>998</i> bytes.
      */
     public int getMaxLineLength() {
         return maxLineLength;
@@ -83,7 +83,7 @@ public final class SMTPDecoder implements ProtocolDecoder {
     /**
      * Sets the allowed maximum size of the line to be decoded. If the size of
      * the line to be decoded exceeds this value, the decoder will throw a
-     * {@link BufferDataException}. The default value is <tt>998</tt> bytes.
+     * {@link BufferDataException}. The default value is <i>998</i> bytes.
      */
     public void setMaxLineLength(int maxLineLength) {
         if (maxLineLength <= 0) {

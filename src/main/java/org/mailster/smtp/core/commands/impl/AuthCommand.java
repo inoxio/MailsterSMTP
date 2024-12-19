@@ -11,7 +11,7 @@ import org.mailster.smtp.core.commands.AbstractCommand;
  * The AUTH command implementation.
  *
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
- * @author Marco Trevisan <mrctrevisan@yahoo.it>
+ * @author Marco Trevisan &lt;mrctrevisan@yahoo.it&gt;
  */
 public class AuthCommand extends AbstractCommand {
 

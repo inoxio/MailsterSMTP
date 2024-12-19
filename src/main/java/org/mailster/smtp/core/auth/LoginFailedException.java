@@ -3,7 +3,7 @@ package org.mailster.smtp.core.auth;
 /**
  * Exception expected to be thrown by a validator (i.e LoginValidator)
  *
- * @author Marco Trevisan <mrctrevisan@yahoo.it>
+ * @author Marco Trevisan &lt;mrctrevisan@yahoo.it&gt;
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
 public class LoginFailedException extends Exception {

@@ -8,7 +8,7 @@ import org.mailster.smtp.util.Base64;
 import junit.util.ServerTestCase;
 
 /**
- * @author Marco Trevisan <mrctrevisan@yahoo.it>
+ * @author Marco Trevisan &lt;mrctrevisan@yahoo.it&gt;
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
 public class AuthTest extends ServerTestCase {

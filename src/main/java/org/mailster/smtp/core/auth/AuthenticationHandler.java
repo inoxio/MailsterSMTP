@@ -9,7 +9,7 @@ import org.mailster.smtp.core.SMTPContext;
  * Since the authentication process can be stateful, an instance of this class can be stateful too.<br>
  * Do not share a single instance of this interface if you don't explicitly need to do so.
  *
- * @author Marco Trevisan <mrctrevisan@yahoo.it>
+ * @author Marco Trevisan &lt;mrctrevisan@yahoo.it&gt;
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
 public interface AuthenticationHandler {
@@ -24,7 +24,7 @@ public interface AuthenticationHandler {
     List<String> getAuthenticationMechanisms();
 
     /**
-     * Initially called using an input string in the RFC2554 form: "AUTH <mechanism> [initial-response]". <br>
+     * Initially called using an input string in the RFC2554 form: "AUTH &lt;mechanism&gt; [initial-response]". <br>
      * This method must provide the correct reply (by filling the <code>response</code> parameter) at each <code>clientInput</code>.
      * <p>
      * Depending on the authentication mechanism, the handshaking process may require

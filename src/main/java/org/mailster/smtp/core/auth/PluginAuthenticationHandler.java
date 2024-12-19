@@ -11,7 +11,7 @@ import org.mailster.smtp.core.SMTPContext;
  * Hence, you can design a single handler for each authentication mechanism and decide how many
  * authentication mechanisms to support by simply plugging them here.
  *
- * @author Marco Trevisan <mrctrevisan@yahoo.it>
+ * @author Marco Trevisan &lt;mrctrevisan@yahoo.it&gt;
  * @author De Oliveira Edouard &lt;doe_wanted@yahoo.fr&gt;
  */
 public class PluginAuthenticationHandler implements AuthenticationHandler {

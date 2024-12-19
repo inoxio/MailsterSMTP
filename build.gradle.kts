@@ -1,6 +1,9 @@
 plugins {
+    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("java-library")
     id("maven-publish")
+    id("signing")
+    id("com.rickbusarow.github-release-fork") version "2.5.2"
 }
 
 group = "de.inoxio"
@@ -8,6 +11,8 @@ version = "1.1.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
+    withJavadocJar()
+    withSourcesJar()
 }
 
 repositories {
@@ -26,53 +31,64 @@ dependencies {
     testRuntimeOnly("ch.qos.logback:logback-classic:1.5.13")
 }
 
-val sourcesJar by tasks.registering(Jar::class) {
-    dependsOn + "classes"
-    archiveClassifier.set("sources")
-    from(sourceSets["main"].allSource)
-}
-
-val javadocJar by tasks.registering(Jar::class) {
-    dependsOn + "javadoc"
-    archiveClassifier.set("javadoc")
-    from(tasks.withType<Javadoc>().first().destinationDir)
-}
-
 publishing {
     publications {
-        register("publication", MavenPublication::class) {
+        create<MavenPublication>("maven") {
             groupId = project.group as String
             artifactId = project.name
             version = project.version as String
 
             from(components["java"])
-            artifact(sourcesJar.get())
-            artifact(javadocJar.get())
 
-            pom.withXml {
-                asNode().apply {
-                    appendNode("description", "A NIO SMTP server API written in Java")
-                    appendNode("name", "$groupId:$artifactId")
-                    appendNode("url", "https://github.com/inoxio/MailsterSMTP")
+            pom {
 
-                    val license = appendNode("licenses").appendNode("license")
-                    license.appendNode("name", "The Apache Software License, Version 2.0")
-                    license.appendNode("url", "http://www.apache.org/licenses/LICENSE-2.0.txt")
+                name = "$groupId:$artifactId"
+                description = "A NIO SMTP server API written in Java"
+                url = "https://github.com/inoxio/MailsterSMTP"
 
-                    val developer = appendNode("developers").appendNode("developer")
-                    developer.appendNode("name", "Michael Kunze")
-                    developer.appendNode("email", "mkunze@inoxio.de")
-                    developer.appendNode("organization", "inoxio Quality Services GmbH")
-                    developer.appendNode("organizationUrl", "https://www.inoxio.de")
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                developers {
+                    developer {
+                        name = "Michael Kunze"
+                        email = "mkunze@inoxio.de"
+                        organization = "inoxio Quality Services GmbH"
+                        organizationUrl = "https://www.inoxio.de"
+                    }
+                }
 
-                    val scm = appendNode("scm")
-                    scm.appendNode("connection", "scm:git:git://github.com/inoxio/MailsterSMTP.git")
-                    scm.appendNode("developerConnection", "scm:git:ssh://github.com:inoxio/MailsterSMTP.git")
-                    scm.appendNode("url", "http://github.com/inoxio/MailsterSMTP/tree/master")
+                scm {
+                    connection = "scm:git:git://github.com/inoxio/MailsterSMTP.git"
+                    developerConnection = "scm:git:ssh://github.com:inoxio/MailsterSMTP.git"
+                    url = "http://github.com/inoxio/MailsterSMTP/tree/master"
                 }
             }
         }
     }
+}
+
+signing {
+    sign(publishing.publications["maven"])
+}
+
+nexusPublishing {
+    repositories {
+        sonatype()
+    }
+}
+
+githubRelease {
+    token(project.findProperty("githubToken.inoxio") as String)
+    repo = "MailsterSMTP"
+    owner = "inoxio"
+    tagName = project.version as String
+    releaseName = project.version as String
+    generateReleaseNotes = true
+    targetCommitish = "master"
 }
 
 tasks {
@@ -86,5 +102,6 @@ tasks {
     }
     withType<Javadoc> {
         (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
+        (options as CoreJavadocOptions).addBooleanOption("Xdoclint:none", true)
     }
 }
