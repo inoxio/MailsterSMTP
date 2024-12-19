@@ -82,7 +82,7 @@ nexusPublishing {
 }
 
 githubRelease {
-    token(project.findProperty("githubToken.inoxio") as String)
+    token(project.findProperty("githubToken.inoxio") as? String)
     repo = "MailsterSMTP"
     owner = "inoxio"
     tagName = project.version as String

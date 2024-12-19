@@ -35,5 +35,9 @@ var server = new SMTPServer(new MessageListenerAdapter() {
 Change version in `build.gradle.kts`, `README.md` and `SMTPServerConfig.java` and issue:
 
 ```bash
-./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository githubRelease
+./gradlew test publishToSonatype closeAndReleaseSonatypeStagingRepository githubRelease
 ```
+
+## Check Renovate
+
+https://developer.mend.io/github/inoxio/MailsterSMTP
