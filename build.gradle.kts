@@ -1,19 +1,14 @@
 plugins {
+    id("com.rickbusarow.github-release-fork") version "2.5.2"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("java-library")
     id("maven-publish")
     id("signing")
-    id("com.rickbusarow.github-release-fork") version "2.5.2"
 }
 
 group = "de.inoxio"
 version = "1.1.0"
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    withJavadocJar()
-    withSourcesJar()
-}
+description = "A NIO SMTP server API written in Java"
 
 repositories {
     mavenCentral()
@@ -31,6 +26,12 @@ dependencies {
     testRuntimeOnly("ch.qos.logback:logback-classic:1.5.13")
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
@@ -43,7 +44,7 @@ publishing {
             pom {
 
                 name = "$groupId:$artifactId"
-                description = "A NIO SMTP server API written in Java"
+                description = project.description
                 url = "https://github.com/inoxio/MailsterSMTP"
 
                 licenses {

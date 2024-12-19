@@ -35,7 +35,7 @@ var server = new SMTPServer(new MessageListenerAdapter() {
 Change version in `build.gradle.kts`, `README.md` and `SMTPServerConfig.java` and issue:
 
 ```bash
-./gradlew test publishToSonatype closeAndReleaseSonatypeStagingRepository githubRelease
+./gradlew clean test publishToSonatype closeAndReleaseSonatypeStagingRepository githubRelease
 ```
 
 ## Check Renovate
