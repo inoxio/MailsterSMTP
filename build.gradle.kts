@@ -23,7 +23,7 @@ dependencies {
     // test
     testImplementation("junit:junit:4.13.2")
     // logging
-    testRuntimeOnly("ch.qos.logback:logback-classic:1.5.16")
+    testRuntimeOnly("ch.qos.logback:logback-classic:1.5.17")
 }
 
 java {
