@@ -1,12 +1,10 @@
 package junit;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.nio.file.Files;
+import java.util.Random;
 
 import com.sun.mail.smtp.SMTPTransport;
 
@@ -35,10 +33,11 @@ import wiser.Wiser;
 public class BigAttachmentTest extends TestCase {
 
     private static final int BUFFER_SIZE = 32768;
-    private static final String BIGFILE_PATH = System.getProperty("java.home")
-            .replace("\\", "/") + "/jmods/java.rmi.jmod";
+    private static final int BIGFILE_SIZE = 5 * 1024 * 1024;
 
     private Wiser wiser;
+
+    private File bigFile;
 
     public BigAttachmentTest(String name) {
         super(name);
@@ -47,6 +46,7 @@ public class BigAttachmentTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        bigFile = createBigFile();
         wiser = new Wiser(SocketUtils.findAvailableTcpPort());
         wiser.setReceiveBufferSize(BUFFER_SIZE);
         wiser.start();
@@ -56,6 +56,19 @@ public class BigAttachmentTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
         wiser.stop();
+        Files.deleteIfExists(bigFile.toPath());
+    }
+
+    /**
+     * Creates a temporary file with random binary content, so the test does not
+     * depend on files of the JDK installation (e.g. jmods, which newer JDKs no longer ship).
+     */
+    private static File createBigFile() throws IOException {
+        var file = File.createTempFile("bigattachment", ".bin");
+        var data = new byte[BIGFILE_SIZE];
+        new Random(42).nextBytes(data);
+        Files.write(file.toPath(), data);
+        return file;
     }
 
     public void testAttachments() throws Exception {
@@ -69,7 +82,7 @@ public class BigAttachmentTest extends TestCase {
         bp1.setHeader("Content-Type", "text/plain");
         bp1.setContent("Hello World!!!", "text/plain; charset=\"ISO-8859-1\"");
 
-        var fileAttachment = new FileDataSource(BIGFILE_PATH);
+        var fileAttachment = new FileDataSource(bigFile);
 
         // Can't test if file not found
         assertTrue(fileAttachment.getFile().exists());
@@ -102,33 +115,10 @@ public class BigAttachmentTest extends TestCase {
             var fos = new FileOutputStream(compareFile);
             ((MimeMultipart) msg.getMimeMessage().getContent()).getBodyPart(1).getDataHandler().writeTo(fos);
             fos.close();
-            assertTrue(checkIntegrity(new File(BIGFILE_PATH), compareFile));
+            assertEquals(-1L, Files.mismatch(bigFile.toPath(), compareFile.toPath()));
 
         } finally {
             compareFile.deleteOnExit();
         }
-    }
-
-    private boolean checkIntegrity(File src, File dest) throws IOException, NoSuchAlgorithmException {
-        var ins = new BufferedInputStream(new FileInputStream(src));
-        var ind = new BufferedInputStream(new FileInputStream(dest));
-        var md1 = MessageDigest.getInstance("MD5");
-        var md2 = MessageDigest.getInstance("MD5");
-
-        var r = 0;
-        var buf1 = new byte[BUFFER_SIZE];
-        var buf2 = new byte[BUFFER_SIZE];
-
-        while (r != -1) {
-            r = ins.read(buf1);
-            ind.read(buf2);
-
-            md1.update(buf1);
-            md2.update(buf2);
-        }
-
-        ins.close();
-        ind.close();
-        return MessageDigest.isEqual(md1.digest(), md2.digest());
     }
 }
