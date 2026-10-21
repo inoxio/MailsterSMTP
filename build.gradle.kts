@@ -1,9 +1,9 @@
+import org.jreleaser.model.Active
+
 plugins {
-    id("com.rickbusarow.github-release-fork") version "2.5.2"
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("java-library")
     id("maven-publish")
-    id("signing")
+    id("org.jreleaser") version "1.26.0"
 }
 
 group = "de.inoxio"
@@ -70,26 +70,44 @@ publishing {
             }
         }
     }
-}
-
-signing {
-    sign(publishing.publications["maven"])
-}
-
-nexusPublishing {
     repositories {
-        sonatype()
+        maven {
+            url = uri(layout.buildDirectory.dir("staging-deploy"))
+        }
     }
 }
 
-githubRelease {
-    token(project.findProperty("githubToken.inoxio") as? String)
-    repo = "MailsterSMTP"
-    owner = "inoxio"
-    tagName = project.version as String
-    releaseName = project.version as String
-    generateReleaseNotes = true
-    targetCommitish = "master"
+jreleaser {
+    signing {
+        active = Active.ALWAYS
+        armored = true
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                create("sonatype") {
+                    active = Active.ALWAYS
+                    url = "https://central.sonatype.com/api/v1/publisher"
+                    stagingRepository("build/staging-deploy")
+                }
+            }
+        }
+    }
+    release {
+        github {
+            repoOwner = "inoxio"
+            name = "MailsterSMTP"
+            tagName = "{{projectVersion}}"
+            releaseName = "{{projectVersion}}"
+            branch = "master"
+            changelog {
+                enabled = false
+            }
+            releaseNotes {
+                enabled = true
+            }
+        }
+    }
 }
 
 tasks {
