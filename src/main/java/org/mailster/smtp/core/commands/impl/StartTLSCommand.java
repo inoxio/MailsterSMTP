@@ -2,7 +2,10 @@ package org.mailster.smtp.core.commands.impl;
 
 import java.io.IOException;
 
+import org.apache.mina.core.future.DefaultWriteFuture;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.DefaultWriteRequest;
+import org.apache.mina.filter.ssl.DisableEncryptWriteRequest;
 import org.apache.mina.filter.ssl.SslFilter;
 import org.mailster.smtp.core.SMTPContext;
 import org.mailster.smtp.core.commands.AbstractCommand;
@@ -53,7 +56,7 @@ public class StartTLSCommand extends AbstractCommand {
         }
 
         try {
-            if (sslFilter.isSslStarted(ioSession)) {
+            if (ioSession.isSecured() || ioSession.getFilterChain().contains(SslFilter.class)) {
                 sendResponse(ioSession, "454 TLS not available due to temporary reason: TLS already active");
                 return;
             }
@@ -61,22 +64,33 @@ public class StartTLSCommand extends AbstractCommand {
             // Insert SSLFilter to get ready for handshaking
             ioSession.getFilterChain().addFirst("SSLfilter", sslFilter);
 
-            // Disable encryption temporarily.
-            // This attribute will be removed by SSLFilter
-            // inside the Session.write() call below.
-            ioSession.setAttribute(SslFilter.DISABLE_ENCRYPTION_ONCE, Boolean.TRUE);
-
             // Write StartTLSResponse which won't be encrypted.
-            sendResponse(ioSession, "220 Ready to start TLS");
-
-            // Now DISABLE_ENCRYPTION_ONCE attribute is cleared.
-            assert ioSession.getAttribute(SslFilter.DISABLE_ENCRYPTION_ONCE) == null;
+            // Since MINA 2.2 SslFilter.DISABLE_ENCRYPTION_ONCE is gone; a write request
+            // implementing DisableEncryptWriteRequest is passed through the SslFilter unencrypted.
+            sendUnencryptedResponse(ioSession, "220 Ready to start TLS");
 
             ctx.getSMTPState().resetAll(); // clean state
             ctx.getDeliveryHandler().resetMessageState();
         } catch (Exception e) {
             LOG.debug("startTLS() failed: {}", e.getMessage());
             LOG.trace("startTLS() failure stack trace", e);
+        }
+    }
+
+    private static void sendUnencryptedResponse(IoSession ioSession, String response) {
+        LOG.debug("S: {}", response);
+        var writeRequest = new UnencryptedWriteRequest(response, new DefaultWriteFuture(ioSession));
+        ioSession.getFilterChain().fireFilterWrite(writeRequest);
+    }
+
+    /**
+     * Write request that bypasses the {@link SslFilter} (replacement for the removed
+     * {@code SslFilter.DISABLE_ENCRYPTION_ONCE} attribute of MINA 2.1).
+     */
+    private static final class UnencryptedWriteRequest extends DefaultWriteRequest implements DisableEncryptWriteRequest {
+
+        UnencryptedWriteRequest(Object message, DefaultWriteFuture future) {
+            super(message, future);
         }
     }
 }
