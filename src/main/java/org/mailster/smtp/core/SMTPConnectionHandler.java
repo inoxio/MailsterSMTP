@@ -7,8 +7,8 @@ import org.apache.mina.core.buffer.BufferDataException;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.filter.ssl.SslFilter;
-import org.apache.mina.filter.ssl.SslFilter.SslFilterMessage;
+import org.apache.mina.filter.FilterEvent;
+import org.apache.mina.filter.ssl.SslEvent;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.mailster.smtp.SMTPServerConfig;
 import org.mailster.smtp.api.handler.DeliveryHandlerFactory;
@@ -97,9 +97,6 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
 
         session.getConfig().setIdleTime(IdleStatus.READER_IDLE, config.getConnectionTimeout() / 1000);
 
-        // We're going to use SSL negotiation notification.
-        session.setAttribute(SslFilter.USE_NOTIFICATION);
-
         // Init protocol internals
         LOG.debug("SMTP connection count: {}", getNumberOfConnections());
 
@@ -161,18 +158,21 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
         }
     }
 
+    /**
+     * SSL negotiation notifications (MINA 2.2 replacement for SslFilter.USE_NOTIFICATION / SslFilterMessage).
+     */
+    @Override
+    public void event(IoSession session, FilterEvent event) {
+        if (event instanceof SslEvent) {
+            LOG.debug("SSL FILTER event -> {}", event);
+        }
+    }
+
     @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
         if (message == null) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("no more lines from client");
-            }
-            return;
-        }
-
-        if (message instanceof SslFilterMessage) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("SSL FILTER message -> " + message);
             }
             return;
         }
