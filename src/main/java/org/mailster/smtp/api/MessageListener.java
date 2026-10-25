@@ -41,7 +41,9 @@ public interface MessageListener {
      *                  private attributes
      * @param from      is the envelope sender in rfc822 form
      * @param recipient will be an accepted recipient in rfc822 form
-     * @param data      will be the smtp data stream, stripped of any extra '.' chars
+     * @param data      will be the smtp data stream, stripped of any extra '.' chars.
+     *                  Large messages are backed by a temporary file, which is deleted
+     *                  once every recipient's stream is closed, so close it when done
      * @throws TooMuchDataException if the listener can't handle that much data.
      *                              An error will be reported to the client.
      * @throws IOException          if there is an IO error reading the input data.
