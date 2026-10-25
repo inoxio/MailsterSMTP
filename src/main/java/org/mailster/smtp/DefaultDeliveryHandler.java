@@ -60,43 +60,42 @@ public class DefaultDeliveryHandler extends AbstractDeliveryHandler {
     }
 
     /**
-     * Implementation of the data receiving portion of things. By default
-     * deliver a copy of the stream to each recipient of the message(the first
-     * recipient is provided the original stream to save memory space). If
-     * you want to change this behavior, then you should implement the
-     * MessageHandler interface yourself.
+     * Implementation of the data receiving portion of things. Each recipient
+     * gets its own copy of the stream, a new view on the same buffer or
+     * temporary file. The original stream is closed after the delivery, so the
+     * temporary file is deleted as soon as every recipient has closed its copy.
+     * A listener should close its stream when it is done with it. If you want
+     * to change this behavior, then you should implement the MessageHandler
+     * interface yourself.
      */
     @Override
     public void data(InputStream data) throws TooMuchDataException, IOException {
-        var useCopy = false;
+        try {
+            if (LOG.isTraceEnabled()) {
+                var charset = getDeliveryContext().getSMTPServerConfig().getCharset();
+                var buf = new byte[16384];
 
-        if (LOG.isTraceEnabled()) {
-            var charset = getDeliveryContext().getSMTPServerConfig().getCharset();
-            var in = SharedStreamUtils.getPrivateInputStream(useCopy, data);
-            var buf = new byte[16384];
-
-            try {
-                var decoder = charset.newDecoder();
-                int len;
-                while ((len = in.read(buf)) >= 0) {
-                    LOG.trace(decoder.decode(ByteBuffer.wrap(buf, 0, len)).toString());
+                try (var in = SharedStreamUtils.getPrivateInputStream(true, data)) {
+                    var decoder = charset.newDecoder();
+                    int len;
+                    while ((len = in.read(buf)) >= 0) {
+                        LOG.trace(decoder.decode(ByteBuffer.wrap(buf, 0, len)).toString());
+                    }
+                } catch (IOException ioex) {
+                    LOG.trace("Mail data logging failed", ioex);
                 }
-            } catch (IOException ioex) {
-                LOG.trace("Mail data logging failed", ioex);
             }
-            useCopy = true;
-        }
 
-        // Prevent concurrent modifications
-        List<Delivery> list = new ArrayList<>(this.deliveries);
+            // Prevent concurrent modifications
+            List<Delivery> list = new ArrayList<>(this.deliveries);
 
-        for (var delivery : list) {
-            delivery.getListener()
-                    .deliver(getSessionContext(), this.from, delivery.getRecipient(),
-                             SharedStreamUtils.getPrivateInputStream(useCopy, data));
-
-            // Use a stream copy on second iteration if not the case yet
-            useCopy = true;
+            for (var delivery : list) {
+                delivery.getListener()
+                        .deliver(getSessionContext(), this.from, delivery.getRecipient(),
+                                 SharedStreamUtils.getPrivateInputStream(true, data));
+            }
+        } finally {
+            data.close();
         }
     }
 }
