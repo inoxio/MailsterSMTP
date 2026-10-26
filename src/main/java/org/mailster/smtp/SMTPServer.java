@@ -7,12 +7,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.executor.ExecutorFilter;
+import org.apache.mina.filter.executor.OrderedThreadPoolExecutor;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.SocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
@@ -132,7 +133,9 @@ public final class SMTPServer {
             codecFactory = new SMTPCodecFactory(config);
             chain.addLast("codec", new ProtocolCodecFilter(codecFactory));
 
-            executor = Executors.newCachedThreadPool(new ThreadFactory() {
+            // the events of one session must run in order: a command the client sends right after the end
+            // of data may only run once the message is delivered and the state reset
+            executor = new OrderedThreadPoolExecutor(0, Integer.MAX_VALUE, 60, TimeUnit.SECONDS, new ThreadFactory() {
                 int sequence;
 
                 @Override
