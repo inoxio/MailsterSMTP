@@ -156,8 +156,12 @@ public final class SMTPDecoder implements ProtocolDecoder {
 
                         try {
                             if (dataMode) {
-                                delimBuf = SMTP_CMD_DELIMITER;
                                 out.write(ctx.getNewInputStream());
+                                // back to commands right away: the handler resets the state only after the
+                                // delivery, a command arriving before must not be read as data
+                                dataMode = false;
+                                delimBuf = SMTP_CMD_DELIMITER;
+                                minaCtx.getSMTPState().setDataMode(false);
                             } else {
                                 buf.limit(buf.limit() - matchCount);
                                 out.write(buf.getString(ctx.getDecoder()));
@@ -167,6 +171,8 @@ public final class SMTPDecoder implements ProtocolDecoder {
                         } finally {
                             ctx.reset();
                             buf.clear();
+                            // after reset, which still shrinks the buffer of the data that went to a file
+                            ctx.setDataMode(dataMode);
                         }
                     } else {
                         var msg = "Line is too long: " + ctx.getOverflowPosition();
