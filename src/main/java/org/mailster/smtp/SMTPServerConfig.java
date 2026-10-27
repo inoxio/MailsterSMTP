@@ -67,9 +67,10 @@ public class SMTPServerConfig {
     private int backlog = 5000;
 
     /**
-     * The socket receive buffer size. Defaults to 128.
+     * The socket receive buffer size. Defaults to -1, the size of the operating system. On Linux a few
+     * hundred bytes made the tcp window tiny, every piece of a mail waited for a delayed ack.
      */
-    private int receiveBufferSize = 128;
+    private int receiveBufferSize = -1;
 
     /**
      * Data limit size before writing it to the disk.
