@@ -90,9 +90,10 @@ public class SMTPConnectionHandler extends IoHandlerAdapter {
     public void sessionCreated(IoSession session) {
         updateNumberOfConnections(+1);
 
-        if (session.getTransportMetadata().getSessionConfigType() == SocketSessionConfig.class) {
+        // the send buffer keeps the size of the operating system, the receive buffer too unless configured
+        if (session.getTransportMetadata().getSessionConfigType() == SocketSessionConfig.class
+                && config.getReceiveBufferSize() > 0) {
             ((SocketSessionConfig) session.getConfig()).setReceiveBufferSize(config.getReceiveBufferSize());
-            ((SocketSessionConfig) session.getConfig()).setSendBufferSize(64);
         }
 
         session.getConfig().setIdleTime(IdleStatus.READER_IDLE, config.getConnectionTimeout() / 1000);
