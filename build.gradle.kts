@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "de.inoxio"
-version = "1.3.1"
+version = "1.3.2"
 description = "A NIO SMTP server API written in Java"
 
 repositories {
