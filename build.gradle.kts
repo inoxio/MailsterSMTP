@@ -3,7 +3,7 @@ import org.jreleaser.model.Active
 plugins {
     id("java-library")
     id("maven-publish")
-    id("org.jreleaser") version "1.26.0"
+    id("org.jreleaser") version "1.27.0"
 }
 
 group = "de.inoxio"
